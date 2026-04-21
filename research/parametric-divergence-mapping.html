@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parametric Divergence Mapping: Deriving Evaluation Criteria from Structured Disagreement Between Frontier Models</title>
+<meta name="description" content="Paper II of III: An alternating two-model protocol for deriving rubric dimensions from structural convergence and divergence on a diffable code artifact. By Siddharth Nigam.">
+<meta name="author" content="Siddharth Nigam">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root,[data-theme="light"]{
+  --paper:#dde3ec;
+  --paper-2:#cdd4df;
+  --ink:#141820;
+  --ink-dim:#5a6470;
+  --ink-faint:#9ba4b0;
+  --rule:#b2bac5;
+  --red:#e24a26;
+  --blue:#1f4d7a;
+  --lime:#c7d33a;
+  --plum:#5e2a60;
+  --hover:rgba(20,24,32,0.035);
+  --dot:rgba(20,24,32,0.24);
+  --glow-a:rgba(226,74,38,0.06);
+  --glow-b:rgba(31,77,122,0.05);
+  --table-head:rgba(20,24,32,0.05);
+  --link:#1f4d7a;
+  --serif:'Source Serif 4','Iowan Old Style',Georgia,serif;
+  --display:'Fraunces','Iowan Old Style',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+[data-theme="dark"]{
+  --paper:#121418;
+  --paper-2:#1a1d22;
+  --ink:#e8ecf2;
+  --ink-dim:#9aa0aa;
+  --ink-faint:#4a4e55;
+  --rule:#2a2d33;
+  --red:#ff6a47;
+  --blue:#7aa7d2;
+  --lime:#d6e046;
+  --plum:#b07ab4;
+  --hover:rgba(232,236,242,0.04);
+  --dot:rgba(232,236,242,0.14);
+  --glow-a:rgba(255,106,71,0.07);
+  --glow-b:rgba(122,167,210,0.05);
+  --table-head:rgba(232,236,242,0.05);
+  --link:#9cc2e5;
+}
+html{scroll-behavior:smooth;font-size:17px}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--serif);line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;position:relative;
+  transition:background .35s ease,color .35s ease;
+}
+body::before{
+  content:"";position:fixed;inset:0;
+  background-image:radial-gradient(circle,var(--dot) 0.6px,transparent 0.6px);
+  background-size:22px 22px;opacity:0.55;
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:"";position:fixed;inset:0;
+  background:radial-gradient(1200px 800px at 85% -10%,var(--glow-a),transparent 60%),
+             radial-gradient(900px 700px at -10% 110%,var(--glow-b),transparent 55%);
+  pointer-events:none;z-index:0;
+}
+article,nav,footer{position:relative;z-index:1}
+
+a{color:var(--link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--red)}
+
+code{font-family:var(--mono);font-size:0.86em;color:var(--ink);letter-spacing:-0.005em}
+
+/* Riso color strip */
+.colorstrip{display:flex;gap:0;height:6px;width:100%;position:fixed;top:0;left:0;right:0;z-index:50}
+.colorstrip span{flex:1}
+.colorstrip span:nth-child(1){background:var(--red)}
+.colorstrip span:nth-child(2){background:var(--lime)}
+.colorstrip span:nth-child(3){background:var(--blue)}
+.colorstrip span:nth-child(4){background:var(--plum)}
+.colorstrip span:nth-child(5){background:var(--ink)}
+
+/* Nav */
+nav{padding:2.2rem 2.5rem 0.5rem;display:flex;justify-content:space-between;align-items:baseline;max-width:1200px;margin:0 auto}
+.mark{font-family:var(--display);font-size:1.05rem;font-weight:500;letter-spacing:-0.015em;color:var(--ink);text-decoration:none;display:inline-flex;align-items:baseline;gap:0.4rem}
+.mark .dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;transform:translateY(-2px);animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.mark em{font-style:italic;color:var(--red);font-weight:400}
+.nav-links{display:flex;gap:1.75rem;align-items:baseline}
+.nav-links a{font-family:var(--mono);font-size:0.72rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.12em;text-decoration:none;position:relative;padding:0.25rem 0;transition:color .15s ease}
+.nav-links a.current{color:var(--ink)}
+.nav-links a:hover{color:var(--red)}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-links a.current::after{transform:scaleX(1);background:var(--red)}
+
+.theme-toggle{
+  background:transparent;border:1px solid var(--rule);border-radius:999px;
+  padding:0.3rem 0.7rem 0.3rem 0.6rem;
+  font-family:var(--mono);font-size:0.62rem;color:var(--ink-dim);
+  text-transform:uppercase;letter-spacing:0.14em;cursor:pointer;
+  display:inline-flex;align-items:center;gap:0.4rem;line-height:1;
+  transition:color .2s ease,border-color .2s ease,background .2s ease;
+}
+.theme-toggle:hover{color:var(--red);border-color:var(--red)}
+.theme-toggle .icon{font-size:0.9rem;line-height:1;transform:translateY(-1px);transition:transform .45s ease}
+.theme-toggle:hover .icon{transform:translateY(-1px) rotate(20deg)}
+.theme-toggle .in-dark,.theme-toggle .in-light{display:none}
+[data-theme="light"] .theme-toggle .in-light{display:inline-flex;align-items:center;gap:0.4rem}
+[data-theme="dark"] .theme-toggle .in-dark{display:inline-flex;align-items:center;gap:0.4rem}
+
+/* Article */
+article{max-width:740px;margin:0 auto;padding:4rem 2rem 4rem}
+
+/* Title block */
+.paper-title{font-family:var(--display);font-size:clamp(1.85rem,3.4vw,2.4rem);font-weight:400;line-height:1.15;letter-spacing:-0.02em;text-align:center;margin-bottom:0.75rem;color:var(--ink)}
+.paper-title em{font-style:italic;color:var(--red);font-weight:400}
+.paper-subtitle{font-family:var(--serif);font-style:italic;font-size:1.02rem;text-align:center;color:var(--ink-dim);margin-bottom:1.5rem;line-height:1.5;max-width:56ch;margin-left:auto;margin-right:auto}
+.paper-meta{text-align:center;font-family:var(--mono);font-size:0.72rem;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:0.35rem}
+.paper-meta strong{color:var(--ink);font-weight:600}
+.paper-actions{text-align:center;margin:2rem 0 1rem;display:flex;justify-content:center;gap:0.5rem;flex-wrap:wrap}
+.paper-actions a{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:var(--mono);font-size:0.72rem;color:var(--ink);
+  text-decoration:none;
+  padding:0.55rem 1rem;
+  border:1px solid var(--ink);border-radius:1px;
+  text-transform:uppercase;letter-spacing:0.1em;
+  transition:all .2s ease;
+}
+.paper-actions a:hover{background:var(--ink);color:var(--paper)}
+
+hr.paper-rule{border:none;border-top:1px solid var(--rule);margin:2rem 0}
+
+/* Series note */
+.series-note{
+  border-left:3px solid var(--plum);
+  padding:1rem 1.25rem;
+  font-size:0.92rem;line-height:1.7;color:var(--ink-dim);
+  margin-bottom:2rem;
+  background:var(--hover);
+}
+.series-note strong{color:var(--ink);font-weight:600}
+
+/* Abstract */
+.abstract{margin-bottom:2rem}
+.abstract h2{font-family:var(--mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.16em;color:var(--red);margin-bottom:0.85rem;font-weight:700}
+.abstract p{font-size:0.95rem;line-height:1.8;margin-bottom:0.85rem}
+.abstract p:last-of-type{margin-bottom:0}
+.keywords{font-size:0.88rem;color:var(--ink-dim);margin-top:1.25rem;font-style:italic}
+.keywords strong{color:var(--ink);font-weight:600;font-style:normal}
+
+/* Sections */
+h2.section-heading{
+  font-family:var(--display);font-size:1.65rem;font-weight:400;
+  margin-top:3.25rem;margin-bottom:1rem;padding-bottom:0.35rem;
+  border-bottom:1px solid var(--rule);
+  letter-spacing:-0.01em;
+  color:var(--ink);
+}
+h3.subsection-heading{
+  font-family:var(--display);font-size:1.15rem;font-weight:500;
+  margin-top:2rem;margin-bottom:0.75rem;color:var(--ink);
+  letter-spacing:-0.005em;
+}
+p{margin-bottom:1rem;font-size:0.98rem}
+em{font-style:italic}
+ol,ul{margin:0 0 1rem 1.5rem;font-size:0.98rem;line-height:1.75}
+ol li,ul li{margin-bottom:0.5rem}
+
+/* Tables */
+.table-wrapper{margin:1.75rem 0;overflow-x:auto;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.table-wrapper table{width:100%;border-collapse:collapse;font-size:0.82rem;font-family:var(--mono)}
+.table-wrapper caption{font-family:var(--serif);font-size:0.88rem;font-style:italic;color:var(--ink-dim);text-align:left;padding:0.75rem 0 1rem;line-height:1.55;caption-side:bottom}
+.table-wrapper th{
+  text-align:left;font-weight:700;
+  padding:0.7rem 0.65rem;
+  border-bottom:1px solid var(--ink);
+  font-size:0.72rem;
+  text-transform:uppercase;letter-spacing:0.08em;
+  background:var(--table-head);
+  color:var(--ink);
+}
+.table-wrapper td{
+  padding:0.55rem 0.65rem;
+  border-bottom:1px solid var(--rule);
+  color:var(--ink);
+  vertical-align:top;
+}
+.table-wrapper tr:last-child td{border-bottom:none}
+.table-wrapper .num{text-align:right;font-variant-numeric:tabular-nums}
+.highlight-row{font-weight:700;background:var(--hover)}
+
+/* Figure */
+.figure{margin:2rem 0;padding:1.25rem 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);text-align:center}
+.figure svg{max-width:100%;height:auto}
+.figure figcaption{font-family:var(--serif);font-style:italic;font-size:0.88rem;color:var(--ink-dim);text-align:left;padding:0.75rem 0 0;line-height:1.55}
+
+/* Numbered rules list */
+.rules-list{counter-reset:rules;margin:1rem 0 1rem 0;list-style:none;padding-left:0}
+.rules-list li{counter-increment:rules;position:relative;padding-left:2.2rem;margin-bottom:0.65rem;font-size:0.98rem;line-height:1.7}
+.rules-list li::before{
+  content:counter(rules) ".";
+  position:absolute;left:0;top:0;
+  font-family:var(--mono);font-size:0.8rem;font-weight:700;
+  color:var(--red);letter-spacing:0.02em;
+  padding-top:0.18rem;
+}
+.rules-list li strong{color:var(--ink);font-weight:600}
+
+/* References */
+.references{margin-top:3.5rem}
+.references h2{
+  font-family:var(--display);font-size:1.65rem;font-weight:400;
+  margin-bottom:1rem;padding-bottom:0.35rem;
+  border-bottom:1px solid var(--rule);
+  letter-spacing:-0.01em;
+}
+.references ol{padding-left:1.5rem;font-size:0.85rem;line-height:1.7;color:var(--ink-dim);margin-left:0}
+.references li{margin-bottom:0.55rem}
+.references .ref-title{font-style:italic;color:var(--ink)}
+
+/* Appendix */
+.appendix h2{
+  font-family:var(--display);font-size:1.4rem;font-weight:400;
+  margin-top:2.5rem;margin-bottom:0.75rem;color:var(--red);
+  letter-spacing:-0.005em;
+}
+.appendix h3{
+  font-family:var(--display);font-size:1.05rem;font-weight:500;
+  margin-top:1.5rem;margin-bottom:0.5rem;color:var(--ink);
+}
+
+/* Copyright */
+.copyright{
+  margin-top:3rem;padding:1.25rem 1.5rem;
+  border:1px solid var(--rule);
+  font-size:0.85rem;line-height:1.7;color:var(--ink-dim);
+}
+.copyright strong{color:var(--ink);font-weight:600}
+.copyright a{color:var(--red)!important}
+
+/* Footer */
+footer{
+  border-top:1px solid var(--rule);
+  margin-top:3rem;padding:2rem 2.5rem;
+  max-width:1200px;margin-left:auto;margin-right:auto;
+  display:flex;justify-content:space-between;align-items:baseline;
+  flex-wrap:wrap;gap:1rem;
+  font-family:var(--mono);font-size:0.7rem;
+  color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.12em;
+}
+footer a{color:var(--ink-dim);text-decoration:none;transition:color .15s ease}
+footer a:hover{color:var(--red)}
+footer .left{display:flex;gap:1.5rem;flex-wrap:wrap}
+footer .sig{color:var(--ink);font-weight:500}
+
+@media (max-width:760px){
+  nav{padding:2rem 1.25rem 0.5rem}.nav-links{gap:1.1rem}
+  article{padding:2.5rem 1.25rem 3rem}
+  html{font-size:16px}
+  footer{padding:1.75rem 1.25rem;flex-direction:column;align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
+}
+</style>
+<script>
+(function(){
+  try{
+    var saved=localStorage.getItem('whenlabs-theme');
+    var sys=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+    document.documentElement.setAttribute('data-theme',saved||sys);
+  }catch(e){document.documentElement.setAttribute('data-theme','light')}
+})();
+</script>
+</head>
+<body>
+
+<div class="colorstrip" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<nav>
+  <a class="mark" href="../index.html" title="Back to WhenLabs">
+    <span class="dot"></span>
+    <span>when<em>labs</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="./" class="current">Research</a>
+    <a href="https://github.com/WhenLabs-org">GitHub</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color scheme">
+      <span class="in-light"><span class="icon">☾</span><span>Dark</span></span>
+      <span class="in-dark"><span class="icon">☀</span><span>Light</span></span>
+    </button>
+  </div>
+</nav>
+
+<article>
+
+<!-- Title Block -->
+<h1 class="paper-title">Parametric Divergence <em>Mapping</em>: Deriving Evaluation Criteria from Structured Disagreement Between Frontier Models</h1>
+<div class="paper-subtitle">Paper II of III: An alternating two-model protocol for deriving rubric dimensions from structural convergence and divergence on a diffable code artifact</div>
+<div class="paper-meta"><strong>Siddharth Nigam</strong></div>
+<div class="paper-meta">Independent Researcher</div>
+<div class="paper-meta">April 2026 | Preprint</div>
+
+<div class="paper-actions">
+  <a href="parametric-divergence-mapping.pdf" download>Download PDF ↓</a>
+  <a href="./">Back to index ←</a>
+</div>
+
+<hr class="paper-rule">
+
+<!-- Series Note -->
+<div class="series-note">
+  <strong>Series Note.</strong> This is the second paper in a three-part series on AI information retrieval and agentic web optimization. Paper I (<em>The Introspective Gap</em>) studied the divergence between an answer engine's self-report of source-selection criteria and behaviorally inferred weights. Paper II introduces Parametric Divergence Mapping (PDM), the empirical methodology used to derive cross-model scoring criteria through iterative refinement. Paper III introduces the AXO (Agent Experience Optimization) framework, a scoring rubric for measuring website readiness for autonomous AI agent task execution.
+</div>
+
+<hr class="paper-rule">
+
+<!-- Abstract -->
+<div class="abstract">
+  <h2>Abstract</h2>
+  <p>Evaluation rubrics for LLM-assisted code artifacts are often written manually, which makes it difficult to tell whether an omitted rule reflects true irrelevance or simply an untested edge case. This paper studies that problem with <strong>Parametric Divergence Mapping (PDM)</strong>, an alternating two-model protocol in which Claude and GPT/Codex edit the same JavaScript measurement script under one narrowly scoped parameter at a time. Each turn must either land one qualifying structural change or return <code>NULL</code>; bilateral <code>NULL</code>/<code>NULL</code> is the convergence signal. The experiment covered four parameters over 77 total iterations: Measurement Accuracy (P1), Edge Case Handling (P2), Coverage Completeness (P3), and Output Clarity (P4). Three parameters converged: P2 at iteration 18, P3 at iteration 14, and P4 at iteration 10; P1 hit its hard cap at 35 without convergence. The logs also show a repeatable behavioral asymmetry under this prompt template: Claude returned <code>NULL</code> 24 times across the full run, whereas GPT/Codex returned <code>NULL</code> 3 times, and many Claude <code>NULL</code>s were subsequently overturned by Codex structural finds.</p>
+  <p>The experiment produced three contributions. First, a reproducible procedure for deriving evaluation criteria from constrained model disagreement on a diffable artifact &mdash; distinct from multi-agent debate or single-model self-refinement in that it serializes independent model turns across repository commits and treats convergence or persistent overturn as rubric evidence. Second, a meta-methodological refinement that emerged from P4: once a <code>NULL</code> is overturned, subsequent <code>NULL</code>s are credible only if they explicitly name the failure surface the prior <code>NULL</code> missed and probe it directly. This "<code>NULL</code> quality" audit is, to our knowledge, novel to cross-model iterative evaluation. Third, two concrete artifacts: a production-ready multi-signal measurement script and a tightened v2 methodology built around pre-registered scopes, visible and hidden fixtures, and explicit acceptance rules.</p>
+  <p>PDM's contribution is methodological, not metaphysical. It does not produce a ground-truth rubric; it produces a reproducible rubric with documented provenance &mdash; every entry traceable to the iteration that added it and the iterations that declined to modify it, <em>conditional on the researcher-chosen scope</em>. That distinction is the methodology's honest contribution and its primary limitation.</p>
+  <div class="keywords"><strong>Keywords:</strong> LLM benchmarking, cross-model evaluation, machine-readability, agent experience optimization, rubric derivation, methodological convergence.</div>
+</div>
+
+<hr class="paper-rule">
+
+<!-- 1. Introduction -->
+<h2 class="section-heading">1. Introduction</h2>
+
+<p>The motivating application in this repository is Syphon's AXO (Agent Experience Optimization) scoring pipeline, which needed empirically grounded dimensions for measuring how well a page supports agent execution rather than a hand-written checklist. That application is concrete, but the underlying methodological problem is broader. Any evaluation rubric for LLM-assisted code artifacts, extraction pipelines, or readiness scores faces the same long-tail difficulty: if a scoring dimension is missing, the artifact can still emit clean, stable output while being wrong in exactly the cases a downstream consumer cares about.</p>
+
+<p>The growing practice of LLM-driven web crawling, retrieval-augmented generation, and tool-use agents has renewed interest in a question search engines addressed pragmatically twenty years ago: what does it mean for a web page to be machine-readable? Search-engine optimization (SEO) answered this with a mix of heuristic ranking features and observable crawl behavior, but the answer was never codified as a public scoring rubric. With agent-driven consumption replacing keyword-driven retrieval, the same codification gap reappears for AXO.</p>
+
+<p>Ad hoc human specification is poorly matched to that setting. A researcher can specify obvious dimensions up front, but hand-written rubrics do not reliably expose which distinctions survive contact with actual parser behavior, transport failures, schema consumers, and fixture diversity. The P1 trajectory in this repository demonstrates the failure mode directly: a broad "measurement accuracy" objective admitted a long sequence of still-plausible fixes without any shared stopping rule, and the loop reached 35 iterations without bilateral closure.</p>
+
+<p>Cross-model iteration is a plausible alternative because disagreement is informative. When two frontier models receive the same active parameter, the same current script, and the same requirement to either land one qualifying change or return <code>NULL</code>, several useful signals become observable. Repeated agreement on <code>NULL</code> suggests that the remaining move space violates the current acceptance criteria. Repeated disagreement isolates surfaces where the parameter definition is still under-specified or where one model family is systematically stricter than the other under the given prompt framing. The experiment operationalized that idea by alternating Claude on odd iterations and GPT/Codex on even iterations, storing every artifact and rationale as a changelog in the repository.</p>
+
+<p>The paper's contribution is not an AXO rubric per se. The core contribution is a reproducible procedure for deriving evaluation criteria from structured convergence and divergence on a diffable artifact. AXO is the application case; Parametric Divergence Mapping is the method. A secondary contribution emerged mid-experiment: the <code>NULL</code>-quality audit refinement described in Section 6.4. This paper does not claim PDM produces a ground-truth rubric; it claims PDM produces a rubric whose entries each have documented provenance, <em>conditional on the researcher-chosen scope</em> &mdash; a weaker but falsifiable claim that the remainder of the paper works out carefully.</p>
+
+<!-- 2. Related Work -->
+<h2 class="section-heading">2. Related Work</h2>
+
+<p>The closest methodological precedent for PDM lies outside the LLM literature entirely, so the related work is organized from nearest to furthest.</p>
+
+<h3 class="subsection-heading">2.1 Paired-annotator corpus labeling with blind adjudication</h3>
+
+<p>The tightest conceptual analogue is the paired-annotator pattern in computational linguistics [1]: two annotators label the same items independently, agreement counts, and disagreement is adjudicated. PDM generalizes this from labels to artifact modifications and from human annotators to models. The structural parallels are direct &mdash; independent turns, documented rationale, explicit adjudication of disagreement &mdash; but two differences matter. First, corpus linguistics treats the label space as fixed and disagreement as noise to resolve. PDM treats <em>scope</em> as fixed but the candidate space as open, and treats disagreement as either a <code>NULL</code>-breakage signal (one side was wrong) or a boundary signal (the scope does not admit convergence here). Second, corpus linguistics has a human-interpretable kappa or alpha statistic; PDM substitutes bilateral <code>NULL</code>/<code>NULL</code> as the stopping criterion, which is weaker but falsifiable in a different way (the next iteration can overturn it).</p>
+
+<h3 class="subsection-heading">2.2 Multi-agent debate and consensus</h3>
+
+<p>Debate-style setups such as [4] use multiple agents or model instances to improve the quality of an answer through contemporaneous exchange. PDM does not ask two agents to jointly solve one problem instance. Instead, it serializes model interaction across repository commits and treats convergence or persistent overturn as evidence about the rubric for a code artifact. The shared intuition is that disagreement is useful rather than purely noisy; the structural difference is that PDM's units of disagreement are persistent artifact states, not conversational turns.</p>
+
+<h3 class="subsection-heading">2.3 Iterative self-improvement</h3>
+
+<p>Self-Refine [6] and Reflexion [7] improve outputs through repeated critique and revision. The main difference is again the object of optimization and the role of independence. Self-Refine and Reflexion are principally single-model refinement procedures. PDM deliberately alternates model families, stores each turn as a versioned artifact, and treats bilateral <code>NULL</code> as the stopping condition. The experiment therefore uses iteration not only to improve a script, but to surface which changes survive adversarially independent re-evaluation.</p>
+
+<h3 class="subsection-heading">2.4 LLM-as-judge</h3>
+
+<p>A large recent literature, especially [10], studies when strong models can approximate human preferences, and bias analyses such as [9] show that evaluator models themselves introduce systematic distortions. PDM is adjacent but distinct. It does not use one model to score another against a fixed rubric. Instead, it derives the rubric dimensions themselves from iterated model behavior under constrained acceptance rules. This shifts the methodological question from "Can a model judge well?" to "Can disagreement and convergence between models reveal which rubric criteria are stable enough to keep?"</p>
+
+<h3 class="subsection-heading">2.5 Constitutional AI</h3>
+
+<p>[2] uses a principles list to guide model behavior and iteratively refines those principles. PDM differs in that its principles list (the scope document) is pre-registered and frozen before iteration begins; revision happens only through pre-committed mid-loop review, a mechanism not invoked in this experiment.</p>
+
+<h3 class="subsection-heading">2.6 Broad benchmark frameworks</h3>
+
+<p>HELM [5] and BIG-bench [8] evaluate models across many pre-specified tasks, scenarios, and metrics. PDM is narrower and more artifact-centric. It does not benchmark a model family across a task suite. It derives parameter-specific evaluation dimensions for one concrete code artifact whose outputs can be diffed, replayed, and checked against visible and hidden fixtures. PDM is a rubric-construction methodology rather than a benchmark.</p>
+
+<!-- 3. Method -->
+<h2 class="section-heading">3. Method: Parametric Divergence Mapping</h2>
+
+<p>The method evolved substantially during the experiment. Table 1 summarizes the evolution from the v1 setup used in P1 to the v2 setup used in P3 and P4; the subsections that follow expand its rows.</p>
+
+<p>The progression from P2 to P4 shows a clear tightening trend: reproducible red/green fixtures in P2, scope plus visible/hidden fixture discipline in P3, and explicit consumer-failure pairs plus value-preservation rules in P4. PDM therefore matured during the experiment. The later parameters are not merely additional trials; they are trials under a substantially better-controlled protocol.</p>
+
+<div class="table-wrapper">
+<caption>Table 1: Design pressures exposed by P1 and the corrections implemented in v2. The v2 protocol was not pre-planned; it was forced by P1's failure modes.</caption>
+<table>
+<thead><tr><th>Design pressure exposed by P1</th><th>v2 correction</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td>Broad parameter definition without a mechanical stopping rule</td><td>P2 narrows qualification to crash prevention or fabrication prevention and disqualifies wording-only changes</td><td><code>PROMPT_TEMPLATE.md</code></td></tr>
+<tr><td>No authoritative falsifiability surface</td><td>P3 requires visible-fixture diversity tables and pre-computed ground truth</td><td><code>PROMPT_TEMPLATE_P3.md</code>, <code>P3_FIXTURES.md</code></td></tr>
+<tr><td>Scope relitigation across iterations</td><td>P3 and P4 introduce binding scope documents with INCLUDE/EXCLUDE lists and hard caps</td><td><code>P3_SCOPE.md</code>, <code>P4_SCOPE.md</code></td></tr>
+<tr><td>No explicit overfit check</td><td>P3 adds hidden holdouts and requires post-change holdout comparison</td><td><code>P3_SCOPE.md</code>, <code>P3_FIXTURES.md</code></td></tr>
+<tr><td>Conversational state burden across turns</td><td>The master Codex prompt externalizes iteration state to repo files and instructs the model to infer the active parameter and iteration from the repository rather than from conversational memory</td><td><code>prompts/MASTER_CODEX_PROMPT.md</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-heading">3.1 Protocol</h3>
+
+<p>PDM uses a simple alternating protocol. A single script is held fixed as the current artifact. One parameter is active at a time. Claude acts on odd-numbered iterations, GPT/Codex on even-numbered iterations, and each turn must do exactly one of two things:</p>
+
+<ol>
+<li>land one qualifying structural change under the active parameter, or</li>
+<li>return <code>NULL</code> and copy the current script unchanged.</li>
+</ol>
+
+<p>Figure 1 shows the decision flow for a single iteration. This structure was present from the start of the experiment and remained stable across parameters. The convergence signal is bilateral <code>NULL</code>: two consecutive <code>NULL</code>s from opposite models on the same script, or an unchanged script accompanied by explicit independent validation that no qualifying move remains. P2 converged in the standard consecutive way at iterations 17&ndash;18, while P3 and P4 show the stronger "independent validation on unchanged script" form: Claude returned <code>NULL</code>, Codex re-audited the unchanged artifact, and also returned <code>NULL</code>.</p>
+
+<figure class="figure">
+<svg viewBox="0 0 520 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PDM protocol flow diagram">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.4" font-family="JetBrains Mono, ui-monospace, Menlo, monospace" font-size="12" color="currentColor">
+    <!-- Top: Current script -->
+    <rect x="170" y="10" width="180" height="40" rx="2" stroke-dasharray="4 3"/>
+    <text x="260" y="35" text-anchor="middle" fill="currentColor" stroke="none">Current script at iter n&minus;1</text>
+    <line x1="260" y1="50" x2="260" y2="80" marker-end="url(#arr)"/>
+
+    <!-- Reads scope + fixtures -->
+    <rect x="160" y="80" width="200" height="44" rx="2"/>
+    <text x="260" y="100" text-anchor="middle" fill="currentColor" stroke="none">Active model reads</text>
+    <text x="260" y="116" text-anchor="middle" fill="currentColor" stroke="none">scope + fixtures</text>
+    <line x1="260" y1="124" x2="260" y2="154" marker-end="url(#arr)"/>
+
+    <!-- Decision: qualifying move? -->
+    <polygon points="260,154 360,204 260,254 160,204"/>
+    <text x="260" y="200" text-anchor="middle" fill="currentColor" stroke="none">Qualifying</text>
+    <text x="260" y="216" text-anchor="middle" fill="currentColor" stroke="none">move found?</text>
+
+    <!-- yes -->
+    <text x="190" y="240" fill="currentColor" stroke="none">yes</text>
+    <line x1="200" y1="234" x2="120" y2="274" marker-end="url(#arr)"/>
+    <rect x="30" y="274" width="180" height="48" rx="2"/>
+    <text x="120" y="294" text-anchor="middle" fill="currentColor" stroke="none">Land one</text>
+    <text x="120" y="310" text-anchor="middle" fill="currentColor" stroke="none">structural change</text>
+
+    <!-- no -->
+    <text x="330" y="240" fill="currentColor" stroke="none">no</text>
+    <line x1="320" y1="234" x2="400" y2="274" marker-end="url(#arr)"/>
+    <rect x="310" y="274" width="180" height="48" rx="2"/>
+    <text x="400" y="294" text-anchor="middle" fill="currentColor" stroke="none">Return <tspan font-weight="700">NULL</tspan>,</text>
+    <text x="400" y="310" text-anchor="middle" fill="currentColor" stroke="none">copy script unchanged</text>
+
+    <!-- merge to lower diamond -->
+    <line x1="120" y1="322" x2="260" y2="360" marker-end="url(#arr)"/>
+    <line x1="400" y1="322" x2="260" y2="360" marker-end="url(#arr)"/>
+
+    <!-- Decision: was n-1 also NULL? -->
+    <polygon points="260,360 360,405 260,450 160,405"/>
+    <text x="260" y="400" text-anchor="middle" fill="currentColor" stroke="none">Was iter n&minus;1</text>
+    <text x="260" y="416" text-anchor="middle" fill="currentColor" stroke="none">also <tspan font-weight="700">NULL</tspan>?</text>
+
+    <!-- no -->
+    <text x="190" y="440" fill="currentColor" stroke="none">no</text>
+    <line x1="200" y1="434" x2="120" y2="470" marker-end="url(#arr)"/>
+    <rect x="20" y="470" width="200" height="25" rx="2" stroke-dasharray="4 3"/>
+    <text x="120" y="488" text-anchor="middle" fill="currentColor" stroke="none">Continue: next model's turn</text>
+
+    <!-- yes -->
+    <text x="330" y="440" fill="currentColor" stroke="none">yes</text>
+    <line x1="320" y1="434" x2="400" y2="470" marker-end="url(#arr)"/>
+    <rect x="300" y="470" width="200" height="25" rx="2" stroke-dasharray="4 3"/>
+    <text x="400" y="488" text-anchor="middle" fill="currentColor" stroke="none" font-weight="700">Bilateral NULL: closed</text>
+  </g>
+</svg>
+<figcaption>Figure 1: PDM protocol for a single iteration. The bilateral <code>NULL</code>/<code>NULL</code> gate is the only convergence condition; every non-<code>NULL</code> restarts the clock. Scope documents, fixture definitions, and prior iterations are available to the active model; the partner model's reasoning for the immediately prior turn is visible only through the changelog it wrote.</figcaption>
+</figure>
+
+<h3 class="subsection-heading">3.2 Parameter Scoping</h3>
+
+<p>The repository shows a clear evolution from loose to pre-registered scoping. P1 ran under the original experiment plan, which described the parameter broadly but did not yet provide a binding include/exclude list or an authoritative fixture suite. By P3 and P4, scope was explicitly pre-registered in standalone documents with INCLUDE and EXCLUDE sections, formal qualification criteria, convergence rules, and hard caps.</p>
+
+<p>The scoping transition matters methodologically because it prevents relitigation. <code>P3_SCOPE.md</code> locks P1 measurement logic and P2 transport logic, bans browser-dependent or constant-valued signals, and requires every new signal to be measurable, meaningful, falsifiable, non-redundant, and additive. <code>P4_SCOPE.md</code> narrows the move space even further to schema consistency, type normalization, null-handling explicitness, precision normalization, and rare field renames, explicitly banning additive changes and semantic changes to signals. The result is that later <code>NULL</code>s are interpretable as closure under a known search space rather than fatigue under an undefined one.</p>
+
+<h3 class="subsection-heading">3.3 Acceptance Criteria</h3>
+
+<p>By the end of the experiment, the acceptance gate had been distilled into five concrete rules, stated explicitly in the P4 materials:</p>
+
+<ol class="rules-list">
+<li><strong>Reproducible consumer failure.</strong> A non-<code>NULL</code> move must name a concrete consumer access pattern that fails before the change and succeeds after it.</li>
+<li><strong>Value preservation.</strong> The move must preserve all field values except the representation change it explicitly introduces.</li>
+<li><strong>Cross-path coverage.</strong> The fix must apply across every code path that emits the affected field.</li>
+<li><strong>Non-bikeshed motivation.</strong> Renames or schema changes must address a real ambiguity or failure, not stylistic preference.</li>
+<li><strong>Idempotence.</strong> Reapplying the move must be equivalent to applying it once.</li>
+</ol>
+
+<p>These criteria are explicit in both the reusable template and the pre-registered scope for P4. P2 and P3 implement narrower parameter-specific variants of the same idea: P2 admits only crash prevention or fabricated-measurement prevention with red/green fixture evidence, and P3 admits only additive new signals with falsifiability tables and non-redundancy against the existing schema.</p>
+
+<h3 class="subsection-heading">3.4 Fixture Architecture</h3>
+
+<p>The v2 framework separates fixtures into two sets. Visible fixtures are shown to both models and define the immediate falsifiability surface. Hidden holdouts are never shown to either model and are used to detect overfitting. For P3, the researcher also computed authoritative ground-truth values in advance, so proposals could be checked against known signal behavior rather than free-form plausibility.</p>
+
+<p>The architecture contains five visible fixtures and two hidden holdouts. The visible set covers product, news, SPA shell, semantic blog, and div-soup landing-page cases. The hidden set covers local business schema and a hybrid SSR-plus-JS page. This design makes two things testable: whether a proposed signal varies at all on the visible set, and whether its apparent novelty survives out-of-distribution examples.</p>
+
+<h3 class="subsection-heading">3.5 <code>NULL</code> Semantics &mdash; With a Worked Example</h3>
+
+<p>The word <code>NULL</code> in this protocol is load-bearing. It is not <em>"I could not think of a change"</em> (which would reward laziness) and not <em>"I do not like any candidate"</em> (which would reward taste). It is a claim that no candidate satisfies all qualification criteria given the current state. A <code>NULL</code> is falsifiable: the partner model on the next iteration either produces a qualifying change (overturning the <code>NULL</code>) or independently returns <code>NULL</code> (ratifying it). The partner's response is the adjudicator.</p>
+
+<p>The cleanest worked example in the repository is the P4 iteration 5&ndash;6 pair, which is worth walking through in full because it demonstrates both failure modes of the protocol at once.</p>
+
+<p>At iteration 5, Claude returned <code>NULL</code> on Parameter 4 (Output Clarity). Its rationale audited cross-fixture leaf types using JavaScript's <code>typeof</code> operator and reported "zero drift &mdash; every leaf has the same type across all 5 visibles on the success path." Under Claude's audit, the parameter was closed.</p>
+
+<p>At iteration 6, Codex overturned that <code>NULL</code>. The overturn identified a failure Claude's audit could not see: <code>typeof</code> in JavaScript returns <code>'number'</code> for both <code>2</code> and <code>2.1</code>, so an integer-valued float field is invisible to Claude's surface. But Python's <code>json.loads</code> treats <code>2</code> as <code>int</code> and <code>2.00</code> as <code>float</code>, so a Python consumer accessing designated float fields <code>weighted_avg_depth</code> and <code>hook_density</code> got <code>int</code> on some fixtures and <code>float</code> on others. Codex's fix &mdash; a fixed-width float serializer &mdash; eliminated the drift at the JSON byte level, which is the surface the consumer actually sees.</p>
+
+<p>Two epistemically distinct outcomes are on display here. Claude's <code>NULL</code> was <em>wrong</em>: the audit surface did not match the consumer's access surface. Later, at iteration 10, Codex returned <code>NULL</code> after re-auditing the iteration 9 artifact, and both models ratified the same state. The log preserves the distinction. A <code>NULL</code> that is broken records a methodological finding (use the right audit surface); a <code>NULL</code> that is ratified records a scope-internal convergence finding. Section 6.4 analyzes the consequence that forced itself on the protocol: once a <code>NULL</code> is broken, the next <code>NULL</code> must explicitly name the failure mode it missed and probe that new surface directly.</p>
+
+<!-- 4. Experimental Setup -->
+<h2 class="section-heading">4. Experimental Setup</h2>
+
+<h3 class="subsection-heading">4.1 Task</h3>
+
+<p>The artifact under refinement was a Node.js script that began as a DOM-depth measurer and ended as a multi-signal AXO measurement tool. The baseline <code>original-script.js</code> fetched a URL server-side and emitted only <code>maximum_depth</code>, <code>average_depth</code>, <code>element_count</code>, <code>timestamp</code>, and <code>error</code>. Through P3 and P4, the script became a 17-key output object with eleven nested signal groups plus the original depth fields.</p>
+
+<h3 class="subsection-heading">4.2 Models</h3>
+
+<p>Claude acted on odd iterations and GPT/Codex on even iterations throughout the experiment. Later protocol materials standardized the Codex side further: the master Codex prompt instructs Codex to determine the current state from repository files, forbids reading hidden holdouts, and treats the repository rather than the conversation as the source of truth for iteration state. Specific model versions are those offered during April 2026 runs. Section 9 discusses the limits of retrospective replication that follow.</p>
+
+<h3 class="subsection-heading">4.3 Fixtures</h3>
+
+<p>The P3/P4 fixture suite contained 5 visible fixtures and 2 hidden holdouts. Ground-truth values for the visible suite were researcher-computed and documented in <code>P3_FIXTURES.md</code> before P3 iteration 1. The visible set was intentionally constructed to vary on the seeded structural axes, while the hidden set tested whether the accepted signals generalized beyond the fixture patterns the models could see.</p>
+
+<h3 class="subsection-heading">4.4 Per-parameter Caps and Scope</h3>
+
+<div class="table-wrapper">
+<caption>Table 2: Per-parameter goals, caps, scope controls, and final artifacts.</caption>
+<table>
+<thead><tr><th>P</th><th>Goal</th><th>Cap</th><th>Scope controls</th><th>Final artifact</th></tr></thead>
+<tbody>
+<tr><td>P1</td><td>Measurement Accuracy</td><td>browser-faithful DOM depth measurement (cap 35)</td><td>original v1 framing only</td><td><code>P-1/iteration-35.js</code></td></tr>
+<tr><td>P2</td><td>Edge Case Handling</td><td>clean errors instead of crashes or fabricated measurements (cap 20)</td><td>v2 prompt with mandatory reproducible fixture rule</td><td><code>P-2/iteration-18.js</code></td></tr>
+<tr><td>P3</td><td>Coverage Completeness</td><td>additive new AXO-relevant signals (cap 20)</td><td>pre-registered scope, visible/hidden fixtures, ground truth</td><td><code>P-3/iteration-14.js</code></td></tr>
+<tr><td>P4</td><td>Output Clarity</td><td>schema consumability without value changes (cap 10)</td><td>pre-registered scope, move categories A&ndash;E, consumer-failure pairs</td><td><code>P-4/iteration-10.js</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The P3 and P4 caps were justified explicitly in the scope documents, which cite P1's scope drift as the motivating failure case for tighter control.</p>
+
+<!-- 5. Results -->
+<h2 class="section-heading">5. Results</h2>
+
+<h3 class="subsection-heading">5.1 P1 Measurement Accuracy</h3>
+
+<p>P1 did not converge. The canonical convergence record reports 35 iterations, 14 Claude <code>NULL</code>s, 0 GPT <code>NULL</code>s, 4 Claude structural changes, and 17 GPT structural changes. The important result is not only that the cap was reached, but how it was reached. GPT/Codex repeatedly found browser-equivalence defects after Claude had declared closure: template opacity at iteration 4, implicit table wrappers at iteration 6, full document-wrapper synthesis at iteration 8, and <code>parseNoneClosedTags</code> at iteration 32.</p>
+
+<p>The same convergence record groups P1 fixes into parser configuration, document synthesis, table wrapper synthesis, traversal transparency, and traversal opacity, and leaves three unresolved deferrals: foster parenting, adoption-agency behavior, and the select content model. Those deferrals all require HTML5 tree-construction state unavailable from the parser output, which means P1 was effectively trying to solve browser-faithful DOM reconstruction without an oracle, without fixtures, and without a tight boundary around what counts as "done."</p>
+
+<h3 class="subsection-heading">5.2 P2 Edge Case Handling</h3>
+
+<p>P2 converged because the failure surface collapsed around one observable bad output: the fabricated synthesized three-element document, reported as <code>maximum_depth: 1, average_depth: 0.7, element_count: 3, error: null</code> on inputs that should not have been measured.</p>
+
+<p>The convergence path is best understood as closure of five causal axes of the same symptom:</p>
+
+<div class="table-wrapper">
+<caption>Table 3: P2 convergence as closure of five causal axes of a single failure symptom.</caption>
+<table>
+<thead><tr><th>Failure axis</th><th>Representative iterations</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td>Transport / HTTP handling</td><td>P2-1, P2-2, P2-4, P2-8</td><td>stack overflow prevention, no-content rejection, partial-content rejection, catch-chain repair</td></tr>
+<tr><td>Auto-parse under claimed HTML</td><td>P2-10, P2-11, P2-12</td><td>falsy coercion fix and upstream non-string rejection</td></tr>
+<tr><td>Declared charset mismatch</td><td>P2-14</td><td>UTF-16LE mojibake rejected upstream</td></tr>
+<tr><td>Pre-parse body shape</td><td>P2-15</td><td>empty, whitespace-only, and plain-text bodies under <code>text/html</code> rejected</td></tr>
+<tr><td>Post-parse zero-element markup</td><td>P2-16</td><td><code>&lt;</code>, comment-only, CDATA, and similar zero-element bodies rejected with doctype exemption</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The last two iterations are especially informative. Claude's iteration 17 <code>NULL</code> argues that all five axes are now closed and classifies remaining candidates as not-a-fabrication, speculative, or wording-only. Codex iteration 18 then independently rechecks doctype shells, empty HTML shells, SVG/XML with real elements, malformed-doctype junk, BOM-prefixed HTML, and transport failures, and also returns <code>NULL</code>. This is a clean example of bilateral closure under a tightened fixture-based rule.</p>
+
+<h3 class="subsection-heading">5.3 P3 Coverage Completeness</h3>
+
+<p>P3 converged at iteration 14 after accepting 11 new signal groups: <code>js_dependency</code>, <code>structured_data</code>, <code>heading_hierarchy</code>, <code>semantic_html</code>, <code>machine_readable_blocks</code>, <code>answer_first</code>, <code>link_profile</code>, <code>selector_affordance</code>, <code>content_depth</code>, <code>text_container_profile</code>, and <code>reference_context</code>. Each signal was required to add a new schema field, vary across the visible fixtures, and clear a non-redundancy test against existing signals.</p>
+
+<p>P3 closes with a strong example of independent validation. Claude iteration 13 rejects <code>temporal_metadata</code> as semantically real but non-redundant only in theory, not on the current fixture set. Codex iteration 14 then also returns <code>NULL</code>, explicitly stating that "Claude's iter-13 analysis was correct" and rejecting <code>temporal_metadata</code>, <code>section_heading_coverage</code>, and <code>article_header_profile</code> under the same non-redundancy criterion. The experiment log records this as bilateral convergence at 14 with the coverage-completeness space saturated under the current fixture suite.</p>
+
+<p>Section 6.7 examines a pattern that is easy to miss in this summary: more than half the accepted P3 signals carry weak-boolean-redundancy flags. That pattern is the single most important caveat on the P3 result.</p>
+
+<h3 class="subsection-heading">5.4 P4 Output Clarity</h3>
+
+<p>P4 is the cleanest illustration of the mature method. It produced six non-<code>NULL</code> moves and four <code>NULL</code> attempts, with bilateral convergence reached at the hard cap of 10 iterations.</p>
+
+<div class="table-wrapper">
+<caption>Table 4: P4 iteration summary. Categories A&ndash;E are schema-consistency (A), type normalization (B), null-handling explicit (C), precision normalization (D), and field rename (E).</caption>
+<table>
+<thead><tr><th>Iter</th><th>Model</th><th>Outcome</th><th>Category / issue</th></tr></thead>
+<tbody>
+<tr><td>P4-1</td><td>Claude</td><td>non-<code>NULL</code></td><td>A: catch-block key-set drift</td></tr>
+<tr><td>P4-2</td><td>GPT/Codex</td><td>non-<code>NULL</code></td><td>C/B: <code>heading_hierarchy</code> null-object</td></tr>
+<tr><td>P4-3</td><td>Claude</td><td>non-<code>NULL</code></td><td>D: <code>average_depth</code> precision normalization</td></tr>
+<tr><td>P4-4</td><td>GPT/Codex</td><td>non-<code>NULL</code></td><td>B: all remaining nested groups object-always</td></tr>
+<tr><td>P4-5</td><td>Claude</td><td><code>NULL</code></td><td>later broken by iter-6</td></tr>
+<tr><td>P4-6</td><td>GPT/Codex</td><td>non-<code>NULL</code></td><td>B: Python-visible int/float normalization via fixed-width float serializer</td></tr>
+<tr><td>P4-7</td><td>Claude</td><td><code>NULL</code></td><td>later broken by iter-8</td></tr>
+<tr><td>P4-8</td><td>GPT/Codex</td><td>non-<code>NULL</code></td><td>B: serializer collision on sentinel-shaped <code>url</code> input</td></tr>
+<tr><td>P4-9</td><td>Claude</td><td><code>NULL</code></td><td>defensible <code>NULL</code> after explicit adversarial audit</td></tr>
+<tr><td>P4-10</td><td>GPT/Codex</td><td><code>NULL</code></td><td>bilateral convergence</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Two methodological failure modes are documented in the changelogs themselves. First, Claude's iteration-5 <code>NULL</code> used JavaScript runtime typing and therefore missed the fact that Python <code>json.loads</code> distinguishes <code>2</code> from <code>2.00</code>; Codex iteration 6 broke that <code>NULL</code> with a real consumer failure on <code>weighted_avg_depth</code> and <code>hook_density</code>. Second, Claude's iteration-7 <code>NULL</code> corrected the audit surface to byte-level JSON inspection but still limited the audit to fixture-path inputs; Codex iteration 8 then showed that the serializer itself could corrupt the top-level <code>url</code> field on adversarial sentinel-shaped input. By iteration 10, both models agreed that the remaining space had collapsed from ambiguity to preference. Codex's convergence rationale states: "What remains is not ambiguity in the emitted JSON. It is preference. That is exactly where P4 is supposed to stop."</p>
+
+<!-- 6. Behavioral Findings -->
+<h2 class="section-heading">6. Behavioral Findings</h2>
+
+<h3 class="subsection-heading">6.1 Observed <code>NULL</code> Asymmetry Under This Prompt Template</h3>
+
+<p>The strongest behavioral result is the <code>NULL</code> asymmetry. Counting directly from the canonical iteration table yields 24 Claude <code>NULL</code>s and 3 GPT/Codex <code>NULL</code>s across the four parameters.</p>
+
+<div class="table-wrapper">
+<caption>Table 5: Observed <code>NULL</code> counts by parameter and model under the prompt template described in this paper. Model-family attributions are deliberately weak; see discussion below.</caption>
+<table>
+<thead><tr><th>Parameter</th><th class="num">Claude <code>NULL</code>s</th><th class="num">GPT/Codex <code>NULL</code>s</th></tr></thead>
+<tbody>
+<tr><td>P1 Measurement Accuracy</td><td class="num">14</td><td class="num">0</td></tr>
+<tr><td>P2 Edge Case Handling</td><td class="num">5</td><td class="num">1</td></tr>
+<tr><td>P3 Coverage Completeness</td><td class="num">2</td><td class="num">1</td></tr>
+<tr><td>P4 Output Clarity</td><td class="num">3</td><td class="num">1</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The logs show a consistent directional difference in behavior. Claude tends to ask whether the remaining move is truly within scope and sufficiently structural to justify continuation. Codex tends to ask whether any definitional or consumer-visible defect still survives. The repository supports this as behavior, not mechanism: P1's convergence record explicitly summarizes Claude as optimizing "scope control and practical impact thresholds" and GPT as optimizing "definitional correctness regardless of implementation cost." P4's broken <code>NULL</code>s show the same asymmetry under a much tighter parameter: Claude stopped once the pre-registered issue list looked closed, whereas Codex continued to search for consumer-visible type corruption and serializer edge cases.</p>
+
+<p><strong>Three possible causes, not cleanly separable on one model pair.</strong> It is tempting to read this as a statement about Claude and Codex as model families. The evidence on <em>n</em>=1 pair does not support that strong a claim. At least three mechanisms could produce this pattern, and the current data cannot cleanly separate them:</p>
+
+<ol>
+<li><strong>Genuine model-family difference in conservatism.</strong> Claude and Codex may differ in how much scope-tightness they apply to ambiguous structural judgments. If this is the dominant cause, the asymmetry should replicate with the same model families under different prompt templates.</li>
+<li><strong>Prompt-template framing effects.</strong> The <code>NULL</code> condition was defined through iteration in prompt materials that one researcher wrote. The phrasing that made <code>NULL</code> feel like a legitimate, falsifiable answer (rather than an admission of failure) may land differently with different models. If this is the dominant cause, the asymmetry should attenuate or flip under a template rewritten by someone else.</li>
+<li><strong>Position effects.</strong> Claude occupied odd iterations, which often meant following a non-<code>NULL</code> structural move where the obvious next change had already been made. Codex occupied even iterations, which often meant following a <code>NULL</code> with fresh surface to probe. This confound is structural, not cosmetic: it could generate the entire observed asymmetry even with identical model behavior.</li>
+</ol>
+
+<p>The section title and prior framing have therefore been kept deliberately weak. What this experiment establishes is <em>a consistent <code>NULL</code> asymmetry under the specific prompt template and iteration schedule used</em>. Generalizing from that observation to a statement about model families requires the cross-pair replication described in Section 11.</p>
+
+<h3 class="subsection-heading">6.2 The Claude-<code>NULL</code> / Codex-Structural-Find Pattern</h3>
+
+<p>This pattern recurs across parameters:</p>
+
+<div class="table-wrapper">
+<caption>Table 6: Recurring pattern of Claude <code>NULL</code> followed by Codex structural find. Model attributions carry the same caveat as Section 6.1.</caption>
+<table>
+<thead><tr><th>Parameter</th><th>Claude <code>NULL</code></th><th>Codex overturn</th></tr></thead>
+<tbody>
+<tr><td>P1</td><td>iter 3</td><td>iter 4 finds template opacity</td></tr>
+<tr><td>P1</td><td>iter 5</td><td>iter 6 finds implicit table wrappers</td></tr>
+<tr><td>P1</td><td>iter 7</td><td>iter 8 synthesizes HTML/HEAD/BODY wrappers</td></tr>
+<tr><td>P1</td><td>iter 31</td><td>iter 32 enables <code>parseNoneClosedTags</code></td></tr>
+<tr><td>P2</td><td>iter 5</td><td>iter 6 improves descriptive HTTP status text within the parameter definition</td></tr>
+<tr><td>P2</td><td>iter 7</td><td>iter 8 fixes catch-branch ordering bug</td></tr>
+<tr><td>P2</td><td>iter 13</td><td>iter 14 finds charset-mismatch fabrication</td></tr>
+<tr><td>P4</td><td>iter 5</td><td>iter 6 finds Python-visible int/float drift</td></tr>
+<tr><td>P4</td><td>iter 7</td><td>iter 8 finds serializer collision on adversarial input</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The pattern does not imply that Claude was simply "too conservative" in every case. P2 iteration 6 is a good counterexample: the change did not alter success-versus-failure control flow, but it still fell within the stated parameter definition because P2 still allowed "descriptive message" quality at that point. The important empirical point is narrower: the model in the second position (Codex, under this schedule) was more willing to keep searching after the model in the first position (Claude) judged the surface saturated.</p>
+
+<h3 class="subsection-heading">6.3 Convergent Follow-Through</h3>
+
+<p>Not all cross-model interaction took the form of overturning a prior <code>NULL</code>. Several of the most productive sequences involved the second model extending the exact failure class just exposed by the first.</p>
+
+<p>In P2, Codex iteration 10 found falsy-coercion fabrication on headerless bodies, and Claude iteration 11 generalized that same auto-parse failure class to claimed-HTML responses. Codex iteration 14 then found the encoding axis of the fabricated-three-element bug, and Claude iteration 15 extended the same class to empty, whitespace-only, and plain-text <code>text/html</code> bodies. Codex iteration 16 extended that one layer deeper again, from pre-parse body shape to post-parse zero-element markup.</p>
+
+<p>At convergence, the same pattern appeared in a stricter form. Claude iteration 13 in P3 returned <code>NULL</code> with a detailed rejection of <code>temporal_metadata</code>. Codex iteration 14 did not merely fail to find a new move; it explicitly validated the same rejection and adopted the same non-redundancy conclusion.</p>
+
+<p>Independent arrival at the same <code>NULL</code> across models is the protocol's strongest convergence signal. It is epistemically distinct from a ratification where the second model simply returns <code>NULL</code>: in independent arrival, the two models' reasoning chains, constructed without access to each other, converge on the same rejection criterion. Two of the three bilateral convergences in this experiment (P3 iteration 14, P4 iteration 10) closed this way.</p>
+
+<h3 class="subsection-heading">6.4 Meta-Methodology Emergent from P4: The <code>NULL</code> Quality Audit</h3>
+
+<p>P4 produced the clearest methodological lesson in the repository: <em>once a <code>NULL</code> is broken, the next <code>NULL</code> has to name the failure mode it missed and then audit that surface directly</em>. This is not a decoration on the protocol &mdash; it is a concrete refinement of what counts as a credible <code>NULL</code>, and it is, to our knowledge, novel to cross-model iterative evaluation methodologies.</p>
+
+<p>Claude's iteration-7 changelog makes the rule explicit. It begins by correcting iteration 5's methodology, stating that the earlier <code>NULL</code> used the wrong surface because JavaScript <code>typeof</code> collapses integer and float values into the same runtime type. Claude's iteration-9 changelog repeats the pattern at a higher bar: it opens by distinguishing itself from iterations 5 and 7 and then documents eight concrete audit surfaces, including adversarial serializer probes that the earlier <code>NULL</code>s had not run.</p>
+
+<p>Stated formally: a credible <code>NULL</code> at iteration <em>n</em> must (a) enumerate the failure modes that broke the most recent <code>NULL</code> in the same parameter, and (b) demonstrate that it has probed each one on the current artifact. <code>NULL</code>s that do not satisfy this are structurally the same as the <code>NULL</code>s that were already overturned. Under the unaugmented protocol, this was implicit; P4's broken-<code>NULL</code> sequence forced it to become explicit.</p>
+
+<p>The generalization beyond this experiment is straightforward. Any iterative convergence protocol where the stopping criterion depends on one side declaring closure is vulnerable to bad-closure declarations that pattern-match to good ones. The <code>NULL</code>-quality audit is a local adversarial check: the closure must survive the surface that the last closure-claim failed to survive. This is cheap to enforce, visible in changelogs after the fact, and directly falsifiable.</p>
+
+<h3 class="subsection-heading">6.5 <code>NULL</code> That Does Not Hold</h3>
+
+<p>P4 iterations 5 and 7 are the clearest examples of methodologically flawed <code>NULL</code>s. They have already been walked through in Section 3.5 and summarized above; the diagnostic point is worth stating separately.</p>
+
+<p>Iteration 5 concluded that no live P4 move remained because it diffed success-path leaf runtime types in JavaScript and found no drift. Codex iteration 6 showed that this missed the relevant consumer surface entirely: Python consumers treat whole-number JSON tokens as <code>int</code>, so designated float fields still drifted across fixtures.</p>
+
+<p>Iteration 7 corrected the type-audit surface but still dismissed serializer fragility as hypothetical refactoring rather than a live consumer failure. Codex iteration 8 then converted that fragility into a reproducing counterexample by passing <code>__AXO_FLOAT__2.00__</code> as the URL and showing that the output corrupted <code>"url"</code> from string to float. The lesson is straightforward: a <code>NULL</code> that only inspects the fixture surface can still fail when the parameter is defined over downstream consumability rather than fixture values.</p>
+
+<h3 class="subsection-heading">6.6 Model-Dependence of Findings</h3>
+
+<p>A question PDM's methodology raises but cannot settle on the evidence of one model pair: are the rubric entries that emerge from PDM model-dependent? If the experiment were re-run with GPT-4 in place of Codex, or Gemini in place of Claude, would the convergence points change?</p>
+
+<p>On the evidence of this experiment, the answer is plausibly yes at the margin and plausibly no at the core. The six weak-boolean-redundancy signals in P3 (analyzed in detail in the next subsection) are the marginal cases: each was accepted on a decomposition argument that a different model pair might have rejected. The P2 failure-class axes are the core cases: both models independently recognized the fabricated-three-element pattern and closed it consistently across transport, encoding, and body-shape axes. The core is more likely to replicate; the margin less so. This is a falsifiable prediction and motivates the cross-pair replication listed under future work (Section 11).</p>
+
+<h3 class="subsection-heading">6.7 Weak-Boolean-Redundancy: When Convergence Accepts Weakly-Distinguishing Signals</h3>
+
+<p>Six of the eleven accepted P3 signals carry explicit weak-boolean-redundancy caveats in the fixture notes: <code>semantic_html</code>, <code>machine_readable_blocks</code>, <code>link_profile</code>, <code>selector_affordance</code>, <code>content_depth</code>, and <code>text_container_profile</code>. That is more than half of P3's accepted output. The pattern is significant enough to analyze separately, because it is the weakest part of the P3 result and the one that would change most under a larger or more diverse fixture set.</p>
+
+<p><strong>What the pattern looks like.</strong> A signal is flagged weak-boolean-redundant when its derived boolean projection (e.g., <code>semantic_html.present</code>, <code>machine_readable_blocks.present</code>) takes the same value across visible fixtures as a previously-accepted signal's boolean projection. For example, by iteration 4, <code>semantic_html.present</code> was true on V1/V2/V4 and false on V3/V5 &mdash; identical to the pattern of <code>heading_hierarchy.valid</code>. The derived boolean adds no new partition over the visible set.</p>
+
+<p><strong>How these signals cleared the bar anyway.</strong> In each case, the signal was accepted because of sub-field or holdout behavior that broke the redundancy at a level below the derived boolean. <code>semantic_html.semantic_element_count</code> distinguishes V1 (8) from V4 (11) where all prior signals collapsed. <code>machine_readable_blocks.address_count</code> exercises a measurement dimension that is flat at zero on all visibles but non-zero on holdout H1. <code>selector_affordance</code>'s boolean is recoverable from prior signals on visibles, but both holdouts break the prior-signal prediction in opposite directions. The acceptance logic, in other words, relied on out-of-distribution behavior to rescue signals that the in-distribution test declared redundant.</p>
+
+<p><strong>Why this is the right place to be skeptical.</strong> Two different reviewers could read the pattern two different ways. The charitable reading is that the protocol correctly identified signals that carry non-redundant information in a dimension the visible set does not exercise, and the holdouts are doing exactly the job they were designed to do. The less charitable reading is that the acceptance criterion is too permissive once the boolean projection is redundant, and accepted signals are disproportionately sub-field decompositions of patterns the existing schema already captures. Both readings are defensible on the current evidence. The <code>reference_context</code> case at iteration 12 is the sharpest version of the tension: Claude's own analysis showed that its derived <code>mode</code> category was fully recoverable from prior signals on all seven fixtures, and it was accepted on sub-field decomposition grounds anyway.</p>
+
+<p><strong>Implications for fixture sizing.</strong> The weak-boolean-redundancy pattern is an empirical argument for larger fixture sets in future PDM runs. Seven fixtures is enough to make every P3 signal falsifiable, but not enough to make every acceptance robust to adding new fixture categories. A production rubric derivation should run PDM on a fixture set of 20 or more with holdouts proportionally larger &mdash; not because the current signals would be falsified, but because a larger set would either retire the weak-boolean-redundancy flags or harden the decomposition arguments into genuinely orthogonal distinctions. This is cheaper to do than it is to argue about in the abstract.</p>
+
+<!-- 7. What PDM Produces -->
+<h2 class="section-heading">7. What PDM Produces and Does Not Produce</h2>
+
+<h3 class="subsection-heading">7.1 What PDM Produces</h3>
+
+<p>PDM produces a rubric whose entries each have a documented provenance: the iteration that added the entry, the iterations that declined to modify or remove it, and the rejection reasons for nearby candidates that did not make the cut. Every entry answers the question "why is this here, and not something else?" with a specific log reference.</p>
+
+<p>This is a weaker claim than "PDM produces a correct rubric." No mechanism in PDM validates the rubric against external ground truth. The rubric is correct <em>relative to the scope document</em>, which the researcher wrote. A badly-scoped parameter produces a badly-grounded rubric (P1 is the experiment's own negative example).</p>
+
+<p>The honest way to state PDM's contribution, which should be preferred over the looser phrasing used in casual summaries: PDM shifts accountability from "the researcher chose these signals" to "the researcher chose this scope, and these signals are what two models independently converge on under it." The scope choice remains researcher-driven; the signal-choice step within that scope is what PDM externalizes. That is a real contribution &mdash; it is strictly more auditable than unconstrained rubric authorship &mdash; but it is not the stronger claim that PDM externalizes rubric construction end-to-end.</p>
+
+<h3 class="subsection-heading">7.2 What PDM Does Not Produce</h3>
+
+<p>PDM does not produce signal weights. Coverage Completeness (P3) converged on eleven signals; the experiment does not claim those eleven signals are equally important for scoring a page's machine-readability. Weight derivation requires a different instrument: either labeled data (pages rated as agent-usable or agent-hostile) or a downstream pipeline whose success is measurable (task-completion rates). This paper addresses only criterion derivation, not weighting.</p>
+
+<p>PDM does not produce per-signal thresholds. P3 added <code>js_dependency.dependent</code> as a boolean signal, but "what value of <code>script_count</code> should flip the boolean" was set by the proposing model's internal judgment, not by convergence. A principled threshold derivation would run a second-order PDM loop on the threshold function parameters, which this paper does not attempt.</p>
+
+<p>PDM does not produce generalization guarantees. The eleven signals came from seven fixtures. Fixtures were representative by construction but not statistical. A signal converged-on in PDM may fail on an unseen fixture class (the weak-boolean-redundancy flags in Section 6.7 are explicit acknowledgments of this risk).</p>
+
+<!-- 8. Discussion -->
+<h2 class="section-heading">8. Discussion</h2>
+
+<h3 class="subsection-heading">8.1 What Bilateral <code>NULL</code>/<code>NULL</code> Actually Signals</h3>
+
+<p>Bilateral <code>NULL</code> in PDM is not a claim of absolute truth. It is a claim that, under the current parameter definition, current acceptance criteria, and current fixture architecture, two independently prompted frontier models both failed to identify a qualifying move. P2-18 says this directly: remaining candidates were "not crashes, not fabrications, already clean errors, or speculative defensive checks." P4-10 states the same idea even more sharply: "What remains is not ambiguity in the emitted JSON. It is preference." In other words, bilateral <code>NULL</code> marks procedural closure, not metaphysical completeness.</p>
+
+<h3 class="subsection-heading">8.2 Why P1 Did Not Converge</h3>
+
+<p>P1 failed for reasons that later protocol documents address directly, even if the repository does not package them as a single five-item postmortem.</p>
+
+<p>First, P1 lacked an authoritative ground-truth oracle. The later P3 fixture suite explicitly says that ground-truth values had to be computed before iteration 1 because otherwise models "cannot be held to the falsifiability rule."</p>
+
+<p>Second, P1's notion of a qualifying structural move was too vague. The original plan defined <code>NULL</code> generically as the absence of a structural improvement, but later v2 materials had to narrow that substantially. <code>PROMPT_TEMPLATE.md</code> explicitly records that P2 dropped a "correct error classification" clause because it was undefined and invited cosmetic or message-quality moves.</p>
+
+<p>Third, P1's scope was too broad. Both <code>P3_SCOPE.md</code> and <code>P4_SCOPE.md</code> cite P1 scope drift to 35 iterations without convergence as the reason for binding INCLUDE/EXCLUDE lists and hard caps.</p>
+
+<p>Fourth, P1 had no falsifiability discipline. P2 adds mandatory red/green fixture evidence, P3 requires visible-fixture diversity tables, and P4 requires a concrete consumer-failure pair. None of that structure existed for P1.</p>
+
+<p>Fifth, the later protocol also reduced the burden of accumulated conversational state by externalizing iteration context into repository files and a reusable master prompt. The repository does not isolate "accumulated context bias" as a separately quantified causal factor, but it does show that later iterations were deliberately redesigned to depend less on free-form conversation state and more on repo-state reconstruction.</p>
+
+<p>Taken together, P1 was an under-instrumented search for browser-faithful DOM equivalence. P2&ndash;P4 were controlled experiments.</p>
+
+<h3 class="subsection-heading">8.3 Generalizability</h3>
+
+<p>PDM is not a general substitute for human evaluation of open-ended generation. It depends on a specific kind of task: the artifact must be diffable, its outputs must be replayable, and at least part of the failure surface must be observable via fixtures, downstream consumer accesses, or both. That is why the method fits a measurement script well and would fit other deterministic or semi-deterministic code-quality tools, but would be much less convincing for unconstrained creative generation.</p>
+
+<h3 class="subsection-heading">8.4 Cost</h3>
+
+<p>The direct cost is easy to count: 35 + 18 + 14 + 10 = 77 iterations, each of which required one model inference plus human operator work to save artifacts, run checks, and update logs. The repository does not track token counts, wall-clock latencies, or operator minutes separately, so precise cost numbers cannot be reported. The method is therefore inexpensive relative to large benchmark construction, but not free: it trades broad annotation expense for iterative operator supervision on one artifact.</p>
+
+<h3 class="subsection-heading">8.5 No External Validity Check</h3>
+
+<p>Nothing in PDM validates that pages scoring well under the derived rubric are, in fact, more machine-readable than pages scoring poorly. This paper does not perform a downstream pipeline evaluation. The AXO framework is planned to run exactly this evaluation in a subsequent phase ("Part 2" of the project, which integrates the P4-final script into Syphon's scoring pipeline and measures agent task-completion rates against pages rated by the rubric), but that phase is outside this paper's scope. Bilateral <code>NULL</code> proves scope-internal stability; it does not prove external utility. Any claim PDM makes about rubric quality is contingent on the eventual Part 2 evaluation.</p>
+
+<!-- 9. Threats to Validity -->
+<h2 class="section-heading">9. Threats to Validity</h2>
+
+<p>The previous section frames PDM's honest limits. This section isolates threats that do not fit cleanly under "limitations" because they are risks to the <em>interpretation</em> of the results rather than caveats on scope. A reviewer in a methodological venue will ask about each of these; the protocol's credibility depends on naming them directly.</p>
+
+<p><strong>Prompt-template confound.</strong> Every rule a model operates under &mdash; what counts as a qualifying move, what <code>NULL</code> means, what fixtures to consult &mdash; was written by one researcher. The prompt materials were themselves iterated during the experiment (Table 1). As a result, statements framed as being about model behavior (e.g., Section 6.1's <code>NULL</code> asymmetry) are more precisely statements about <em>model behavior under this specific template</em>. A second researcher writing the prompt might produce different asymmetries, different convergence points, or different move-category taxonomies. This is not fixable by post-hoc analysis; it is fixable only by replication with prompt variation.</p>
+
+<p><strong>Operator as hidden third judge.</strong> The protocol is described as a two-model alternation. In practice, one human operator ran the loop: saving artifacts, verifying that changelogs cited specific fixtures and code paths, and writing the convergence record. When a model produced a non-<code>NULL</code> move that looked marginal, the operator's implicit adjudication was the forward-progress signal. No inter-rater reliability measurement exists for this role because the operator was a single person. The appendices preserve the raw model outputs, which makes operator influence reconstructible in principle, but the paper does not attempt to quantify it.</p>
+
+<p><strong>Version irreproducibility.</strong> "Claude" and "GPT/Codex" refer to the specific model versions offered during April 2026 runs. Neither service offers retrospective version pinning. Replication attempts will necessarily use newer model versions and may reach different convergence points on the same scope and fixtures. This is a threat to the <em>output</em> reproducibility of the experiment, not to the <em>protocol</em> reproducibility. The paper's primary claim is about the protocol; the specific convergence points, including which signals P3 accepted and where P4 closed, are second-order findings whose replication is expected to be imperfect.</p>
+
+<p><strong>Fixture leakage.</strong> The P3-6 <code>answer_first</code> signal used an <code>informativeSentencePattern</code> regex that Claude itself later flagged as mixing generic patterns with fixture-specific content words. The signal was accepted anyway. This is a positive flag for the paper's transparency, but it is also a case where the acceptance rule did not catch a leakage risk. A tighter protocol would add an explicit fixture-independence check to the qualification criteria &mdash; any proposed signal whose measurement code mentions fixture-specific tokens should require additional holdout evidence before acceptance.</p>
+
+<p><strong>Small-<em>n</em> behavioral claims.</strong> Section 6.1 reports 24 vs. 3 <code>NULL</code>s on one model pair with 77 total iterations. This is a strong directional signal for the specific configuration, but the denominator is too small to support confidence intervals on rate differences, and there is no natural null distribution to test against. Behavioral claims in this paper are qualitative descriptions of the observed run, not statistical generalizations. Future runs should be designed with this in mind: either a larger iteration budget per parameter, or multiple independent runs with the same scope.</p>
+
+<p><strong>Confirmation bias in the mid-experiment protocol rewrite.</strong> The v1&rarr;v2 transition happened after P1 failed. The designer of v2 had seen P1's failure modes, which means v2 is selected to address those failure modes. P2&ndash;P4 therefore test v2 on tasks where v1 was already known to be inadequate. This is a standard limitation of any iteratively-designed methodology and is not secretly fixable, but a clean future run would apply v2 to a fresh task from iteration 1 without any v1 baseline.</p>
+
+<!-- 10. Limitations -->
+<h2 class="section-heading">10. Limitations</h2>
+
+<p>The threats above cover the interpretive risks. This section lists the scope and coverage constraints that remain even under the most favorable interpretation of the results.</p>
+
+<ul>
+<li>The experiment used two model families, not a larger jury. The observed asymmetry may not replicate with different pairings.</li>
+<li>Iteration caps were pragmatic choices justified in scope documents, not statistically optimized stopping rules.</li>
+<li>The category system for P4 moves (A&ndash;E) was introduced only when the output-clarity parameter began, not from the start of the full experiment.</li>
+<li>The dominant P2 bug class, the fabricated synthesized three-element document, is specific to this script and parser stack. The methodology generalizes better than the bug class does.</li>
+<li>The repository does not include a standalone P1 postmortem file quantifying every proposed root cause. Some discussion in the "Why P1 did not converge" subsection therefore reconstructs protocol lessons from later documents rather than quoting a single canonical postmortem.</li>
+<li>Seven fixtures is a small sample. Weak-boolean-redundancy flags in P3 (Section 6.7) are explicit acknowledgments that adding fixtures could force re-classification. A production rubric derivation would run PDM on a fixture set of 20 or more, with holdouts proportionally larger.</li>
+</ul>
+
+<!-- 11. Future Work -->
+<h2 class="section-heading">11. Future Work</h2>
+
+<p>The paper's contribution is a methodology and one worked application. Three follow-on directions are most valuable, in rough order of priority.</p>
+
+<p><strong>Cross-model-pair replication.</strong> Replicate the protocol with different model pairings (GPT-4 + Gemini, Llama + Mistral) on the same scope documents and fixtures. Convergence points that replicate across pairs are strong candidates for model-independent rubric entries. Convergence points that differ reveal model-pair-dependent artifacts, which is itself useful information. This is the single highest-value follow-up: it directly addresses the prompt-template confound and the small-<em>n</em> behavioral claim from Section 9, and it is cheap relative to running PDM from scratch on a new artifact.</p>
+
+<p><strong>Weight derivation via downstream evaluation.</strong> The eleven signals from P3 need weights before they form a scoring function. Weight derivation via PDM would require a parameter like "P5 &mdash; Signal Weighting," with moves of the form "increase weight of <code>structured_data</code> relative to <code>selector_affordance</code> by factor X" and a convergence condition tied to a held-out task-completion evaluation. This is the bridge to the AXO scoring pipeline described in Part 2.</p>
+
+<p><strong>Downstream integration and validation.</strong> Integrate <code>p4-final.js</code> as the production AXO measurement script and test whether the derived dimensions improve end-to-end scoring behavior in Syphon. This is the external validity check PDM itself cannot provide and the only evidence that the converged rubric measures what it was supposed to measure. The other extensions listed in earlier drafts (three-model PDM, automated mid-loop review, formalization of divergence signals, cross-domain PDM applications) are interesting but secondary to these three.</p>
+
+<!-- 12. Conclusion -->
+<h2 class="section-heading">12. Conclusion</h2>
+
+<p>The repository provides a complete worked example of deriving evaluation criteria rather than assuming them. Across 77 alternating iterations, PDM produced one non-converged parameter, three converged parameters, a production-ready measurement script, and a visibly tighter experimental framework than the one it started with.</p>
+
+<p>The central empirical result is not that two frontier models eventually agreed. It is that their pattern of disagreement and closure exposed which rubric dimensions were still unstable, which ones survived independent re-audit, and which methodological safeguards were necessary before a <code>NULL</code> could be trusted. The <code>NULL</code>-quality audit that emerged from P4 &mdash; requiring each new <code>NULL</code> to probe the surface that broke the last one &mdash; is a refinement that transfers beyond this application to any iterative convergence protocol with researcher-declared closure.</p>
+
+<p>PDM does not produce ground-truth rubrics; it produces reproducible rubrics with documented provenance, conditional on the researcher-chosen scope. That distinction is the methodology's honest contribution and its primary limitation. For deterministic code artifacts with replayable outputs, it is a useful contribution in its own right.</p>
+
+<!-- References -->
+<div class="references">
+<h2>References</h2>
+<ol>
+<li>Artstein, R., &amp; Poesio, M. (2008). <span class="ref-title">Inter-Coder Agreement for Computational Linguistics.</span> Computational Linguistics, 34(4), 555&ndash;596.</li>
+<li>Bai, Y., et al. (2022). <span class="ref-title">Constitutional AI: Harmlessness from AI Feedback.</span> Anthropic technical report.</li>
+<li>Brin, S., &amp; Page, L. (1998). <span class="ref-title">The Anatomy of a Large-Scale Hypertextual Web Search Engine.</span> Computer Networks and ISDN Systems.</li>
+<li>Du, Y., et al. (2023). <span class="ref-title">Improving Factuality and Reasoning in Language Models through Multi-agent Debate.</span> arXiv:2305.14325.</li>
+<li>Liang, P., et al. (2022). <span class="ref-title">Holistic Evaluation of Language Models (HELM).</span> arXiv:2211.09110.</li>
+<li>Madaan, A., et al. (2023). <span class="ref-title">Self-Refine: Iterative Refinement with Self-Feedback.</span> arXiv:2303.17651.</li>
+<li>Shinn, N., et al. (2023). <span class="ref-title">Reflexion: Language Agents with Verbal Reinforcement Learning.</span> arXiv:2303.11366.</li>
+<li>Srivastava, A., et al. (2022). <span class="ref-title">Beyond the Imitation Game: Quantifying and extrapolating the capabilities of language models (BIG-bench).</span> arXiv:2206.04615.</li>
+<li>Wang, Y., et al. (2023). <span class="ref-title">Self-Consistency Improves Chain of Thought Reasoning in Language Models.</span> arXiv:2203.11171.</li>
+<li>Zheng, L., et al. (2023). <span class="ref-title">Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena.</span> arXiv:2306.05685.</li>
+</ol>
+</div>
+
+<!-- Appendix -->
+<div class="appendix">
+<h2>Appendix A. Changes from Prior Draft</h2>
+
+<p>This revision implements structural changes to framing, adds two sections, reorders related work, and tightens the future-work discussion. Substantive factual claims and empirical results are preserved from the prior draft. The principal changes:</p>
+
+<ul>
+<li><strong>Title and abstract.</strong> Revised to foreground the meta-methodological finding (<code>NULL</code>-quality audit from P4) and to explicitly qualify the rubric-provenance claim as conditional on researcher-chosen scope.</li>
+<li><strong>Related Work (Section 2).</strong> Reordered to lead with paired-annotator corpus labeling (the tightest conceptual analogue) rather than closing with it. Multi-agent debate, iterative self-improvement, LLM-as-judge, Constitutional AI, and benchmark frameworks now read as contrast cases rather than primary framing.</li>
+<li><strong>Method (Section 3).</strong> The v1&rarr;v2 evolution table has been pulled forward to serve as the section's organizing structure, and Figure 1 has been added to show the per-iteration decision flow. Section 3.5 (<code>NULL</code> Semantics) now includes the P4-5/P4-6 worked example inline rather than referencing it later.</li>
+<li><strong>Behavioral Findings (Section 6).</strong> Section 6.1 renamed from "Claude/Codex Asymmetry" to "Observed <code>NULL</code> Asymmetry Under This Prompt Template" and extended with a three-cause analysis (model-family difference, prompt-template framing, position effect) that cannot be cleanly separated on <em>n</em>=1 pair.</li>
+<li><strong>New subsection on weak-boolean-redundancy (Section 6.7).</strong> The pattern affects more than half of P3's accepted signals and is the single strongest caveat on the coverage-completeness result; it now has dedicated analysis.</li>
+<li><strong>New Threats to Validity section (Section 9).</strong> Separated from Limitations. Covers prompt-template confound, operator as hidden third judge, version irreproducibility, fixture leakage, small-<em>n</em> behavioral claims, and confirmation bias in the mid-experiment protocol rewrite.</li>
+<li><strong>Future Work (Section 11).</strong> Cut from seven directions to three, ordered by priority. The removed items were not weak; they were simply drowning out the three that matter most.</li>
+<li><strong>"What PDM Produces" (Section 7).</strong> The scope-internal qualifier is now promoted into the main claim rather than being available as a footnote-style caveat.</li>
+<li><strong>Appendices.</strong> The original iteration logs, fixture specifications, prompt template, signal list, and selected changelogs are preserved substantially unchanged. These serve as archival evidence and are the strongest support for the methodology; condensing them would weaken the paper.</li>
+</ul>
+
+<p>Readers familiar with the prior draft should find the empirical results identical. What has changed is the framing around those results and the honesty of the qualifications attached to them.</p>
+
+<h2>Appendix B. Full Iteration Log Table</h2>
+
+<p>Full iteration-level logs for all four parameters, including per-iteration changes and <code>NULL</code> declarations, are preserved in the repository at <code>experiment-log.md</code> and in the per-iteration changelogs at <code>P-{1,2,3,4}/iteration-{n}-changelog.md</code>. The summary structure is as follows:</p>
+
+<h3>P1 Measurement Accuracy (35 iterations, no convergence)</h3>
+<p>Claude <code>NULL</code>s at iterations 3, 5, 7, 9, 11, 13, 17, 21, 23, 25, 27, 29, 31, 33 (14 total). Notable GPT structural finds include template opacity (iter 4), implicit table wrappers (iter 6), document-wrapper synthesis (iter 8), <code>parseNoneClosedTags</code> (iter 32). Iteration 35 is non-<code>NULL</code> (added <code>plaintext</code> to <code>blockTextElements</code>); cap reached mid-progress.</p>
+
+<h3>P2 Edge Case Handling (18 iterations, converged at iter 18)</h3>
+<p>Claude <code>NULL</code>s at iterations 5, 7, 9, 13, 17 (5 total). GPT <code>NULL</code> at iteration 18. Key structural moves include stack-overflow prevention (iter 1), HTTP 204/205 handling (iter 2), catch-branch ordering fix (iter 8), declared-charset validation (iter 14), post-parse zero-element guard with doctype exemption (iter 16).</p>
+
+<h3>P3 Coverage Completeness (14 iterations, converged at iter 14)</h3>
+<p>Claude <code>NULL</code>s at iterations 11, 13 (2 total). GPT <code>NULL</code> at iteration 14. All eleven accepted signals listed in Section 5.3 were added across iterations 1&ndash;12.</p>
+
+<h3>P4 Output Clarity (10 iterations, converged at hard cap)</h3>
+<p>Claude <code>NULL</code>s at iterations 5, 7, 9 (3 total). GPT <code>NULL</code> at iteration 10. The P4 move category distribution: A (iter 1), C/B (iter 2), D (iter 3), B (iters 4, 6, 8).</p>
+
+<p>Full per-iteration summaries are in Appendix A of the prior draft and in the repository.</p>
+
+<h2>Appendix C. Fixture Specifications and Ground-Truth Values</h2>
+
+<h3>C.1 Fixture Inventory</h3>
+
+<div class="table-wrapper">
+<caption>Table 7: Visible fixtures shown to both models.</caption>
+<table>
+<thead><tr><th>#</th><th>File</th><th>Category and purpose</th></tr></thead>
+<tbody>
+<tr><td>V1</td><td><code>visible/v1-product.html</code></td><td>E-commerce product page. JSON-LD Product + Offer + AggregateRating; spec table; one JS-LD script; semantic structure.</td></tr>
+<tr><td>V2</td><td><code>visible/v2-news.html</code></td><td>News article, clean heading hierarchy. Article wrapper; one H1, multiple H2s with H3s; time element; no JavaScript.</td></tr>
+<tr><td>V3</td><td><code>visible/v3-spa.html</code></td><td>JavaScript-dependent SPA shell. Near-empty body; multiple script tags; no real content in raw HTML.</td></tr>
+<tr><td>V4</td><td><code>visible/v4-blog.html</code></td><td>Semantic-rich blog post. Uses header/nav/main/article/section/aside/footer; no JSON-LD; strong structure signals.</td></tr>
+<tr><td>V5</td><td><code>visible/v5-divsoup.html</code></td><td>Div-only marketing landing page. No semantic tags; no structured data; no headings; no JavaScript.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="table-wrapper">
+<caption>Table 8: Hidden holdouts never shown to either model.</caption>
+<table>
+<thead><tr><th>#</th><th>File</th><th>Category and purpose</th></tr></thead>
+<tbody>
+<tr><td>H1</td><td><code>holdout/h1-localbiz.html</code></td><td>Local business with LocalBusiness schema. Overfit check for structured-data and entity signals.</td></tr>
+<tr><td>H2</td><td><code>holdout/h2-hybrid.html</code></td><td>Hybrid &mdash; summary SSR, interactive JS. Overfit check for JS-dependency threshold (has scripts AND real content).</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>C.2 Baseline Outputs Before P3</h3>
+
+<div class="table-wrapper">
+<caption>Table 9: Baseline depth measurements before P3 signals were added.</caption>
+<table>
+<thead><tr><th>#</th><th>Fixture</th><th class="num">maximum_depth</th><th class="num">average_depth</th><th class="num">element_count</th></tr></thead>
+<tbody>
+<tr><td>V1</td><td>v1-product</td><td class="num">9</td><td class="num">4.9</td><td class="num">48</td></tr>
+<tr><td>V2</td><td>v2-news</td><td class="num">6</td><td class="num">4.0</td><td class="num">39</td></tr>
+<tr><td>V3</td><td>v3-spa</td><td class="num">2</td><td class="num">1.7</td><td class="num">13</td></tr>
+<tr><td>V4</td><td>v4-blog</td><td class="num">7</td><td class="num">4.0</td><td class="num">38</td></tr>
+<tr><td>V5</td><td>v5-divsoup</td><td class="num">8</td><td class="num">4.7</td><td class="num">46</td></tr>
+<tr><td>H1</td><td>h1-localbiz</td><td class="num">6</td><td class="num">3.9</td><td class="num">35</td></tr>
+<tr><td>H2</td><td>h2-hybrid</td><td class="num">5</td><td class="num">2.9</td><td class="num">25</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Full ground-truth values across all accepted P3 signals (the 7-fixture &times; 11-signal matrix) are preserved in <code>P3_FIXTURES.md</code> in the repository and in Appendix B.3 of the prior draft.</p>
+
+<h2>Appendix D. Accepted P3 Signals</h2>
+
+<p>Signals with weak-boolean-redundancy notes are analyzed in Section 6.7. The <code>reference_context</code> case is the sharpest version of the tension: Claude's own analysis showed that its derived <code>mode</code> was fully recoverable from prior signals on all seven fixtures, and it was accepted on sub-field decomposition grounds.</p>
+
+<div class="table-wrapper">
+<caption>Table 10: Eleven signals accepted in P3, with agent-task category and redundancy notes.</caption>
+<table>
+<thead><tr><th>Iter</th><th>Signal</th><th>Agent-task category</th><th>Redundancy note</th></tr></thead>
+<tbody>
+<tr><td>P3-1</td><td><code>js_dependency</code></td><td>no-browser SSR/SPA routing</td><td>holdout H2 prevented script-count overfit</td></tr>
+<tr><td>P3-2</td><td><code>structured_data</code></td><td>fact extraction for product/business identity</td><td>holdout H1 flipped positive</td></tr>
+<tr><td>P3-3</td><td><code>heading_hierarchy</code></td><td>outline-based extraction and summarization</td><td>clean non-redundancy case</td></tr>
+<tr><td>P3-4</td><td><code>semantic_html</code></td><td>main-content isolation</td><td>weak boolean redundancy; sub-fields rescue</td></tr>
+<tr><td>P3-5</td><td><code>machine_readable_blocks</code></td><td>in-content micro-data extraction</td><td>weak boolean redundancy; holdout H2 rescues</td></tr>
+<tr><td>P3-6</td><td><code>answer_first</code></td><td>fast answer routing</td><td>accepted with fixture-leakage warning</td></tr>
+<tr><td>P3-7</td><td><code>link_profile</code></td><td>crawl-out and fake-nav detection</td><td><code>fragment_only</code> adds second axis</td></tr>
+<tr><td>P3-8</td><td><code>selector_affordance</code></td><td>selector-first automation</td><td>weak boolean redundancy; both holdouts break prediction</td></tr>
+<tr><td>P3-9</td><td><code>content_depth</code></td><td>readability / summarization routing</td><td>weak visible redundancy, holdouts rescue</td></tr>
+<tr><td>P3-10</td><td><code>text_container_profile</code></td><td>extraction-primitive selection</td><td>weak redundancy on one projection, categorical novelty survives</td></tr>
+<tr><td>P3-12</td><td><code>reference_context</code></td><td>multi-hop research crawl</td><td>accepted on sub-field decomposition despite <code>mode</code> reducibility</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Appendix E. Reproducibility Commands</h2>
+
+<h3>E.1 Environment</h3>
+<p>Node.js 20.x LTS; Python 3.11+ (for consumer-failure reproduction in P4); macOS 15.x (darwin 25.4.0) &mdash; portable to Linux; no GPU or special hardware required.</p>
+
+<h3>E.2 Running a Single Iteration</h3>
+<div class="math-block" style="text-align:left;font-size:0.82rem;line-height:1.6;padding:1rem 1.25rem">
+# From the repository root<br>
+npm install<br>
+npm run fixtures&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# start fixture server<br>
+node P-4/iteration-10.js http://localhost:&lt;port&gt;/fixtures/v1
+</div>
+
+<h3>E.3 Scope Documents</h3>
+<p>All scope documents are checked into the repository and frozen at parameter-start: <code>EXPERIMENT_PLAN.md</code>, <code>PROMPT_TEMPLATE.md</code>, <code>PROMPT_TEMPLATE_P3.md</code>, <code>PROMPT_TEMPLATE_P4.md</code>, <code>P3_SCOPE.md</code>, <code>P4_SCOPE.md</code>, and <code>prompts/MASTER_CODEX_PROMPT.md</code>.</p>
+
+<h3>E.4 Artifact Versioning</h3>
+<p>Every iteration produces two files: <code>P-{n}/iteration-{m}.js</code> (the script) and <code>P-{n}/iteration-{m}-changelog.md</code> (rationale). Parameter baselines: <code>p2-baseline.js = P-1/iteration-35.js</code>; <code>p3-baseline.js = P-2/iteration-18.js</code>; <code>p4-baseline.js = P-3/iteration-14.js</code>; <code>p4-final.js = P-4/iteration-10.js</code> (intended for AXO integration).</p>
+
+<h3>E.5 Model-Version Caveats</h3>
+<p>See Section 9. Replication attempts will use different model versions and may reach different convergence points. The protocol &mdash; not the output &mdash; is what the paper claims is reproducible.</p>
+
+<h3>E.6 License and Authorship</h3>
+<p>Repository released under a permissive license. The paper and experiment are authored solely by Siddharth Nigam; no co-authorship is asserted on behalf of the models whose outputs constitute the experimental data. Model outputs are treated analogously to instrument readings: recorded, cited, and analyzed, without attribution of authorship to the instrument.</p>
+
+</div>
+
+<!-- Copyright -->
+<div class="copyright">
+<strong>Copyright Notice.</strong> &copy; 2026 Siddharth Nigam. All rights reserved. This work is the intellectual property of the author. No part of this paper may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the author, except for brief quotations in critical reviews and certain other noncommercial uses permitted by copyright law. For permissions, contact <a href="mailto:siddharth@whenlabs.org" style="color:var(--accent)">siddharth@whenlabs.org</a>.
+</div>
+
+</article>
+
+<footer>
+  <div class="left">
+    <span class="sig">WhenLabs · MMXXVI</span>
+    <a href="https://github.com/Caissaisdead">Siddharth Nigam</a>
+    <a href="mailto:siddharth@whenlabs.org">siddharth@whenlabs.org</a>
+  </div>
+  <div>Paper II · Parametric Divergence Mapping</div>
+</footer>
+
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  btn.addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme')||'light';
+    var next=cur==='light'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',next);
+    try{localStorage.setItem('whenlabs-theme',next)}catch(e){}
+  });
+  var mq=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');
+  if(mq&&mq.addEventListener){
+    mq.addEventListener('change',function(e){
+      try{if(localStorage.getItem('whenlabs-theme'))return}catch(_){}
+      document.documentElement.setAttribute('data-theme',e.matches?'dark':'light');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
