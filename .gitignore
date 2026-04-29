@@ -1,0 +1,12 @@
+# macOS Finder metadata
+.DS_Store
+
+# Stale tool cache (whenlabs/stale)
+.stale-cache/
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Backup files from in-place edits
+*.bak
