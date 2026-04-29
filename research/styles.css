@@ -6,7 +6,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root,:root[data-theme="light"]{
-  --bg:#eae7e8;
+  --bg:#e8e3e5;
   --bg-soft:#dfdcd7;
   --ink:#0d0d0e;
   --ink-soft:#27282b;
