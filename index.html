@@ -417,9 +417,8 @@ body{font-feature-settings:"tnum"}
    CENTER FLOATING TICKER UNDER FIGURE
    ============================================ */
 .ticker{
-  position:absolute;right:5.2vw;bottom:18vh;
+  position:absolute;right:5.2vw;bottom:5vh;
   z-index:3;
-  width:25vw;min-width:280px;max-width:380px;
   display:flex;gap:14px;align-items:center;justify-content:flex-start;
   font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
   color:var(--ink-soft);
@@ -427,7 +426,7 @@ body{font-feature-settings:"tnum"}
   border:0;
   padding:8px 0;
   opacity:0;animation:panelIn .8s ease 1.05s forwards;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;
 }
 .ticker .dot{
   width:6px;height:6px;border-radius:50%;background:var(--hot);
@@ -440,6 +439,7 @@ body{font-feature-settings:"tnum"}
    ============================================ */
 @media (max-width:980px){
   html,body{overflow-y:auto;overflow-x:hidden;height:auto}
+  .hero{height:auto;overflow:visible}
   .stage{position:relative;height:46vh;min-height:340px}
   .stage img{position:relative;height:100%;width:100%}
   .panel{position:relative;inset:auto;width:auto;height:auto;margin:14px}
