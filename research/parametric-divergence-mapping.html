@@ -19,6 +19,7 @@
 </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <nav class="nav">
   <a class="mark" href="../index.html">whenlabs<span class="d">.</span></a>
@@ -34,9 +35,32 @@
     <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="3.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>
     <span id="theme-label">DARK</span>
   </button>
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+    <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
 </nav>
 
-<article>
+<div class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="Site navigation" hidden>
+  <div class="nav-drawer-panel">
+    <div class="nav-drawer-head">
+      <a class="mark" href="/">whenlabs<span class="d">.</span></a>
+      <button class="nav-drawer-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg>
+      </button>
+    </div>
+    <nav class="nav-drawer-links" aria-label="Mobile primary">
+      <a href="/index.html#workshop">Workshop</a>
+      <a href="/research/">Research</a>
+      <a href="/index.html#now">Now</a>
+      <a href="/index.html#about">About</a>
+      <a href="/blog/">Blog</a>
+      <a href="mailto:siddharth@whenlabs.org">Contact</a>
+    </nav>
+    <p class="nav-drawer-meta">whenlabs · open for collab</p>
+  </div>
+</div>
+
+<article id="main">
 
 <!-- Title Block -->
 <h1 class="paper-title">Parametric Divergence <em>Mapping</em>: Deriving Evaluation Criteria from Structured Disagreement Between Frontier Models</h1>
@@ -737,5 +761,6 @@ node P-4/iteration-10.js http://localhost:&lt;port&gt;/fixtures/v1
 })();
 </script>
 
+<script src="/assets/nav.js" defer></script>
 </body>
 </html>

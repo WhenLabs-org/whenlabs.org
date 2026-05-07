@@ -234,7 +234,7 @@
     .about { grid-template-columns: 1fr; gap: 32px; }
     .hud { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   }
-  @media (max-width: 700px) {
+  @media (max-width: 768px) {
     .wordmark { font-size: 72px; }
     .contact-band h2 { font-size: 56px; }
     .section-title { font-size: 36px; }
@@ -245,10 +245,12 @@
     .paper .pm, .paper .pa { display: none; }
     .nav .links { display: none; }
     .nav .meta { display: none; }
+    .nav .pill { display: none; }
   }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
@@ -276,7 +278,7 @@
 
 <!-- NAV -->
 <nav class="nav">
-  <a class="mark" href="#top">whenlabs<span class="d">.</span></a>
+  <a class="mark" href="#main">whenlabs<span class="d">.</span></a>
   <div class="links">
     <a href="#workshop">Workshop</a>
     <a href="#research">Research</a>
@@ -290,10 +292,33 @@
     <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="3.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>
     <span id="theme-label">DARK</span>
   </button>
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+    <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
 </nav>
 
+<div class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="Site navigation" hidden>
+  <div class="nav-drawer-panel">
+    <div class="nav-drawer-head">
+      <a class="mark" href="#main">whenlabs<span class="d">.</span></a>
+      <button class="nav-drawer-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg>
+      </button>
+    </div>
+    <nav class="nav-drawer-links" aria-label="Mobile primary">
+      <a href="#workshop">Workshop</a>
+      <a href="#research">Research</a>
+      <a href="#now">Now</a>
+      <a href="#about">About</a>
+      <a href="/blog/">Blog</a>
+      <a href="mailto:siddharth@whenlabs.org">Contact</a>
+    </nav>
+    <p class="nav-drawer-meta">whenlabs · open for collab</p>
+  </div>
+</div>
+
 <!-- HERO -->
-<div class="hero-pin" id="top">
+<div class="hero-pin" id="main">
 <header class="hero">
   <div class="hero-bg" id="hero-shader"></div>
   <div class="three-stage" id="three-mount"></div>
@@ -825,5 +850,6 @@
   })();
 </script>
 
+<script src="/assets/nav.js" defer></script>
 </body>
 </html>
