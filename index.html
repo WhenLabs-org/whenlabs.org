@@ -185,6 +185,15 @@
   .tool .desc { font-family: var(--sans); font-size: 14px; color: var(--muted); line-height: 1.45; }
   .tool .stack { position: absolute; left: 28px; bottom: 22px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
 
+  /* Workshop empty state — lava lamp loader */
+  .workshop-empty { border-top: 1px solid var(--line); padding: 96px 0 112px; display: flex; flex-direction: column; align-items: center; gap: 36px; }
+  .workshop-empty .lava ellipse, .workshop-empty .lava circle { fill: var(--accent); }
+  .workshop-empty .lava-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; color: var(--muted); text-transform: uppercase; }
+  @keyframes l09-rise { 0% { transform: translateY(60px) scale(0.6); } 100% { transform: translateY(-80px) scale(1.1); } }
+  .l09-blob { animation: l09-rise 3s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+  .l09-blob.b2 { animation-delay: -1s; }
+  .l09-blob.b3 { animation-delay: -2s; }
+
   /* RESEARCH — papers list */
   .papers { border-top: 1px solid var(--line); }
   .paper { display: grid; grid-template-columns: 80px 1fr 220px 100px 60px; gap: 24px; padding: 32px 0; border-bottom: 1px solid var(--line); align-items: baseline; transition: background 0.2s, padding 0.2s; cursor: pointer; }
@@ -389,7 +398,24 @@
     <h2 class="section-title">The <em>workshop.</em></h2>
     <div class="section-meta">IN PROGRESS →</div>
   </div>
-  <div style="border-top:1px solid var(--line); padding:64px 0; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:0.16em; color:var(--muted); text-transform:uppercase;">// tools coming soon</div>
+  <div class="workshop-empty">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <filter id="goo-strong">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b"/>
+          <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -12"/>
+        </filter>
+      </defs>
+    </svg>
+    <svg class="lava" width="80" height="180" viewBox="0 0 80 180" filter="url(#goo-strong)" aria-hidden="true">
+      <ellipse cx="40" cy="160" rx="34" ry="14"/>
+      <ellipse cx="40" cy="20"  rx="34" ry="14"/>
+      <circle class="l09-blob"    cx="40" cy="100" r="16"/>
+      <circle class="l09-blob b2" cx="32" cy="100" r="12"/>
+      <circle class="l09-blob b3" cx="48" cy="100" r="14"/>
+    </svg>
+    <div class="lava-label">// tools coming soon</div>
+  </div>
 </section>
 
 <!-- RESEARCH -->
