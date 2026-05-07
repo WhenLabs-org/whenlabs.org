@@ -170,13 +170,11 @@
   .tool .stack { position: absolute; left: 28px; bottom: 22px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
 
   /* Workshop empty state — lava lamp loader */
-  .workshop-empty { border-top: 1px solid var(--line); padding: 96px 0 112px; display: flex; flex-direction: column; align-items: center; gap: 36px; }
-  .workshop-empty .lava ellipse, .workshop-empty .lava circle { fill: var(--accent); }
+  .workshop-empty { border-top: 1px solid var(--line); padding: 96px 24px 112px; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; }
+  .workshop-empty .empty-line { font-family: var(--sans); font-size: 24px; line-height: 1.4; max-width: 560px; color: var(--ink); }
+  .workshop-empty .empty-line em { font-family: var(--serif); font-style: italic; color: var(--accent); }
+  .workshop-empty .empty-line a { color: var(--accent); border-bottom: 1px solid currentColor; }
   .workshop-empty .lava-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; color: var(--muted); text-transform: uppercase; }
-  @keyframes l09-rise { 0% { transform: translateY(60px) scale(0.6); } 100% { transform: translateY(-80px) scale(1.1); } }
-  .l09-blob { animation: l09-rise 3s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
-  .l09-blob.b2 { animation-delay: -1s; }
-  .l09-blob.b3 { animation-delay: -2s; }
 
   /* RESEARCH — papers list */
   .papers { border-top: 1px solid var(--line); }
@@ -235,7 +233,7 @@
     .hud { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   }
   @media (max-width: 768px) {
-    .wordmark { font-size: 72px; }
+    .wordmark { font-size: 56px; }
     .contact-band h2 { font-size: 56px; }
     .section-title { font-size: 36px; }
     .section-head { grid-template-columns: 1fr; gap: 12px; margin-bottom: 32px; }
@@ -246,6 +244,15 @@
     .nav .links { display: none; }
     .nav .meta { display: none; }
     .nav .pill { display: none; }
+    /* Hero: shrink + drop the H4 shader + hide portrait choreography */
+    .hero-pin { height: 120vh; }
+    #hero-shader { display: none; }
+    .portrait { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav .pill .dot { animation: none; }
+    .wordmark { transition: none; }
+    html, body { transition: none; }
   }
 </style>
 </head>
@@ -287,7 +294,7 @@
   </div>
   <span class="spacer"></span>
   <span class="meta">v1.4.2 · MMXXVI</span>
-  <span class="pill"><span class="dot"></span>OPEN FOR COLLAB</span>
+  <a class="pill" href="mailto:siddharth@whenlabs.org" aria-label="Email — open for collab"><span class="dot"></span>OPEN FOR COLLAB</a>
   <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" type="button">
     <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="3.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>
     <span id="theme-label">DARK</span>
@@ -332,13 +339,13 @@
   </aside>
   <!-- Cat slab (slides in from right after portrait) -->
   <aside class="portrait cat" id="portrait-cat">
-    <img src="assets/cat.png" alt="My cat" />
+    <img src="assets/cat.png" alt="My cat" loading="lazy" />
     <div class="pmeta t"><span class="pname">MY CAT</span><span>FRAME 07 / 12</span></div>
     <div class="pmeta b"><span>PORTRAIT · 50MM</span><span>2025</span></div>
   </aside>
   <!-- Office slab (slides in from right after cat) -->
   <aside class="portrait cat" id="portrait-office">
-    <img src="assets/office.png" alt="My office" />
+    <img src="assets/office.png" alt="My office" loading="lazy" />
     <div class="pmeta t"><span class="pname">MY OFFICE</span><span>FRAME 11 / 12</span></div>
     <div class="pmeta b"><span>INTERIOR · 24MM</span><span>2025</span></div>
   </aside>
@@ -408,21 +415,7 @@
     <div class="section-meta">IN PROGRESS →</div>
   </div>
   <div class="workshop-empty">
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      <defs>
-        <filter id="goo-strong">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="b"/>
-          <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -12"/>
-        </filter>
-      </defs>
-    </svg>
-    <svg class="lava" width="80" height="180" viewBox="0 0 80 180" filter="url(#goo-strong)" aria-hidden="true">
-      <ellipse cx="40" cy="160" rx="34" ry="14"/>
-      <ellipse cx="40" cy="20"  rx="34" ry="14"/>
-      <circle class="l09-blob"    cx="40" cy="100" r="16"/>
-      <circle class="l09-blob b2" cx="32" cy="100" r="12"/>
-      <circle class="l09-blob b3" cx="48" cy="100" r="14"/>
-    </svg>
+    <p class="empty-line">Tools shipping soon. <em>In the meantime,</em> see <a href="#research">research</a> for what&rsquo;s live now.</p>
     <div class="lava-label">// tools coming soon</div>
   </div>
 </section>
@@ -537,9 +530,11 @@
 
 <!-- HERO SHADER + 3D KEYBOARD MOUNT (vanilla, runs after DOM) -->
 <script type="text/babel">
-  // Mount the H4 grid shader behind the hero.
+  // Mount the H4 grid shader behind the hero — desktop only.
+  // Mobile skips the second WebGL context entirely (perf + battery).
   const heroBg = document.getElementById('hero-shader');
-  if (heroBg && window.HeroH4) {
+  const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+  if (heroBg && window.HeroH4 && isDesktop) {
     function HeroBgComp() {
       const wrapRef = React.useRef(null);
       const [size, setSize] = React.useState({ w: 0, h: 0 });
@@ -608,7 +603,8 @@
     camera.position.set(0, 1.5, 6.5);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const dprCap = window.matchMedia('(min-width: 768px)').matches ? 2 : 1;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, dprCap));
     renderer.setSize(W, H);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
@@ -723,9 +719,10 @@
     ro.observe(mount);
     window.addEventListener('resize', resize);
 
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function tick() {
       const idle = performance.now() - lastInteract > 1500;
-      if (model && idle) model.rotation.y += 0.003;
+      if (model && idle && !prefersReduced) model.rotation.y += 0.003;
       controls.update();
       renderer.render(scene, camera);
       requestAnimationFrame(tick);
@@ -759,8 +756,10 @@
 
     const clamp01 = v => Math.max(0, Math.min(1, v));
     const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
 
     function update() {
+      if (isMobile) return;
       const rect = pin.getBoundingClientRect();
       const total = pin.offsetHeight - window.innerHeight;
       const raw = clamp01(-rect.top / Math.max(1, total));
