@@ -10,3 +10,18 @@
 
 # Backup files from in-place edits
 *.bak
+
+# AI assistant context & private planning (never ship)
+.claude/
+CLAUDE.md
+AGENTS.md
+.cursorrules
+.cursor/
+.aware.json
+.aware/
+plan.md
+context.md
+roadmap.md
+scope.md
+notes.md
+TODO.md
