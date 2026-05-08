@@ -169,7 +169,7 @@
   .tool .desc { font-family: var(--sans); font-size: 14px; color: var(--muted); line-height: 1.45; }
   .tool .stack { position: absolute; left: 28px; bottom: 22px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
 
-  /* Workshop empty state — lava lamp loader */
+  /* Workshop empty state — placeholder while tools are in flight */
   .workshop-empty { border-top: 1px solid var(--line); padding: 96px 24px 112px; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; }
   .workshop-empty .empty-line { font-family: var(--sans); font-size: 24px; line-height: 1.4; max-width: 560px; color: var(--ink); }
   .workshop-empty .empty-line em { font-family: var(--serif); font-style: italic; color: var(--accent); }
@@ -249,11 +249,7 @@
     #hero-shader { display: none; }
     .portrait { display: none; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .nav .pill .dot { animation: none; }
-    .wordmark { transition: none; }
-    html, body { transition: none; }
-  }
+  /* prefers-reduced-motion handled globally in /assets/site.css */
 </style>
 </head>
 <body>
