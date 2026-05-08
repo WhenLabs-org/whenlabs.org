@@ -4,85 +4,121 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blog — WhenLabs</title>
-<meta name="description" content="Engineering updates from the WhenLabs developer toolkit.">
+<meta name="description" content="Notes and release writeups from WhenLabs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#e0e0e0;
-  --surface-2:#d4d4d4;
-  --text:#1a1a18;
-  --text-dim:#6e6e68;
-  --accent:#c46a1a;
-  --mono:'JetBrains Mono',monospace;
-  --serif:'Instrument Serif',Georgia,serif;
-  --shadow-light:#ffffff;
-  --shadow-dark:rgba(163,163,163,0.7);
-  --neu-out:8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
-  --neu-in:inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-}
-html{font-size:16px}
-body{background:var(--bg);color:var(--text);font-family:var(--mono);line-height:1.65;-webkit-font-smoothing:antialiased}
-
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;
-  background:var(--bg);
-  box-shadow:0 4px 8px var(--shadow-dark), 0 -2px 6px var(--shadow-light);
-}
-.nav-logo{font-size:0.85rem;font-weight:700;letter-spacing:-0.02em;color:var(--accent);text-decoration:none}
-.nav-links{display:flex;gap:1.5rem}
-.nav-links a{color:var(--text-dim);text-decoration:none;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;padding:0.3rem 0.7rem;border-radius:8px;transition:all .2s}
-.nav-links a:hover{color:var(--accent);box-shadow:var(--neu-in)}
-
-main{max-width:720px;margin:0 auto;padding:8rem 2rem 4rem}
-main h1{font-family:var(--serif);font-size:2.2rem;font-weight:400;margin-bottom:2rem}
-
-.post-card{
-  display:block;text-decoration:none;color:var(--text);
-  background:var(--bg);border:none;border-radius:16px;
-  padding:1.75rem;margin-bottom:1.25rem;
-  box-shadow:var(--neu-out);
-  transition:transform .25s ease, box-shadow .25s ease;
-}
-.post-card:hover{transform:translateY(-3px);box-shadow:10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light)}
-.post-title{font-size:1rem;font-weight:700;margin-bottom:0.4rem}
-.post-date{font-size:0.72rem;color:var(--text-dim);margin-bottom:0.6rem}
-.post-excerpt{font-size:0.8rem;color:var(--text-dim);line-height:1.7}
-
-footer{max-width:720px;margin:0 auto;padding:2rem;font-size:0.7rem;color:var(--text-dim);border-top:1px solid var(--surface-2)}
-footer a{color:var(--text-dim);text-decoration:none}
-footer a:hover{color:var(--accent)}
-
-@media(max-width:560px){nav{padding:0.75rem 1rem}.nav-links{gap:1rem}main{padding:6rem 1.25rem 3rem}}
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<script>
+(function(){
+  try{
+    if (localStorage.getItem('wl-theme') === 'dark') document.documentElement.setAttribute('data-theme','dark');
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
-<nav>
-  <a class="nav-logo" href="/">@whenlabs/when</a>
-  <div class="nav-links">
-    <a href="/">Home</a>
-    <a href="/blog/">Blog</a>
-    <a href="https://github.com/WhenLabs-org/when">GitHub</a>
+<nav class="nav">
+  <a class="mark" href="/">whenlabs<span class="d">.</span></a>
+  <div class="links">
+    <a href="/research/">Research</a>
+    <a href="/index.html#now">Now</a>
+    <a href="./" class="current">Blog</a>
+    <a href="mailto:siddharth@whenlabs.org">Contact</a>
   </div>
+  <span class="spacer"></span>
+  <span class="meta">BLOG · MMXXVI</span>
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode">
+    <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="3.2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>
+    <span id="theme-label">DARK</span>
+  </button>
+  <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+    <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
 </nav>
 
-<main>
-  <h1>Blog</h1>
+<div class="nav-drawer" id="nav-drawer" role="dialog" aria-modal="true" aria-label="Site navigation" hidden>
+  <div class="nav-drawer-panel">
+    <div class="nav-drawer-head">
+      <a class="mark" href="/">whenlabs<span class="d">.</span></a>
+      <button class="nav-drawer-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 2 L10 10 M10 2 L2 10"/></svg>
+      </button>
+    </div>
+    <nav class="nav-drawer-links" aria-label="Mobile primary">
+      <a href="/index.html#workshop">Workshop</a>
+      <a href="/research/">Research</a>
+      <a href="/index.html#now">Now</a>
+      <a href="/index.html#about">About</a>
+      <a href="/blog/">Blog</a>
+      <a href="mailto:siddharth@whenlabs.org">Contact</a>
+    </nav>
+    <p class="nav-drawer-meta">whenlabs · open for collab</p>
+  </div>
+</div>
 
-  <a class="post-card" href="/blog/v0.10.0.html">
-    <div class="post-title">v0.10.0: One Command to Rule Them All</div>
-    <div class="post-date">April 15, 2026</div>
-    <div class="post-excerpt">Magical project onboarding, auto-fix MCP tools, cross-tool intelligence, and unified .whenlabs.yml config. The release that collapses six-tool complexity into one command.</div>
-  </a>
+<main class="index" id="main">
+
+  <header class="page-head">
+    <div class="eyebrow">
+      <span class="rule"></span>
+      <span>Notes</span>
+      <span>No. 01</span>
+      <span>Siddharth Nigam</span>
+    </div>
+    <h1>Blog<em>.</em></h1>
+    <p class="subtitle">
+      Engineering writeups and release notes from the WhenLabs developer toolkit.
+      Short pieces, mostly about tools, process, and what shipped.
+    </p>
+  </header>
+
+  <section class="papers">
+
+    <article class="paper">
+      <div class="index">v0.10.0</div>
+      <div class="body">
+        <div class="kindrow">
+          <span class="kind paper-tag">Release</span>
+          <span class="kind series">@whenlabs/when</span>
+        </div>
+        <a class="title" href="v0.10.0.html">v0.10.0: One Command to <em>Rule Them All</em></a>
+        <div class="series-line">
+          Magical project onboarding, auto-fix MCP tools, cross-tool intelligence,
+          and a unified <code>.whenlabs.yml</code> config.
+        </div>
+        <p class="excerpt">
+          The release that collapses six-tool complexity into one command.
+          <em>when init</em> replaces four to eight setup commands; auto-fix
+          MCP variants merge scan-and-fix into a single round-trip; and a
+          unified config file becomes the single source of truth for every
+          tool in the toolkit.
+        </p>
+        <div class="meta">April 2026 · Independent · ~5k words</div>
+        <div class="actions">
+          <a href="v0.10.0.html">Read online <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <a class="backlink" href="/"><span class="arr">←</span> Back to whenlabs</a>
 
 </main>
 
 <footer>
-  Built by <a href="https://github.com/Caissaisdead">Siddharth</a> at WhenLabs &middot; MIT License
+  <div class="left">
+    <span class="sig">Siddharth Nigam</span>
+    <span>· WhenLabs · MMXXVI</span>
+  </div>
+  <div class="right">
+    <a href="https://github.com/Caissaisdead">GitHub</a>
+  </div>
 </footer>
 
+<script src="/assets/nav.js" defer></script>
 </body>
 </html>

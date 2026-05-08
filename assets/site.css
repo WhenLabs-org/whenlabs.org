@@ -139,6 +139,19 @@ article code {
   background: var(--paper); padding: 1px 6px; border-radius: 3px;
   border: 1px solid var(--line);
 }
+article pre {
+  background: var(--paper); color: var(--ink);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 18px 22px;
+  font-family: var(--mono); font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 0 0 22px;
+}
+:root[data-theme="dark"] article pre { background: #0a0a0c; color: #e8e6e3; }
+article pre code { background: none; border: none; padding: 0; font-size: inherit; color: inherit; }
 
 article ul, article ol { padding-left: 26px; margin: 0 0 18px; font-size: 17px; line-height: 1.7; }
 article ul li, article ol li { margin-bottom: 8px; }
