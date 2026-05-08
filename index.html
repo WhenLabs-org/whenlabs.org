@@ -204,6 +204,14 @@
   .about--solo { display: grid; grid-template-columns: 80px 1fr 220px; gap: 32px; }
   .about--solo > div { grid-column: 2; max-width: 720px; }
 
+  /* Bio (#bio) grid — collapses to single column on mobile */
+  .bio-grid { display: grid; grid-template-columns: 80px 1fr 220px; gap: 32px; align-items: start; }
+  .bio-grid .body { max-width: 760px; font-family: var(--sans); font-size: 19px; line-height: 1.55; color: var(--ink); }
+  .bio-grid .body p { margin: 0 0 18px; }
+  .bio-grid .body p em { font-family: var(--serif); font-style: italic; color: var(--accent); }
+  .bio-grid .body p.tail { margin: 0; color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; }
+  .bio-grid .verbs { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; text-align: right; line-height: 1.7; }
+
   /* CONTACT — big band: always dark, regardless of theme */
   .contact-band { background: #0e0e0e; color: #f3f1ec; padding: 96px 36px; border-top: 1px solid var(--line); }
   html[data-theme="dark"] .contact-band { background: #050506; }
@@ -248,6 +256,10 @@
     .hero-pin { height: 120vh; }
     #hero-shader { display: none; }
     .portrait { display: none; }
+    /* Bio: collapse to single column, drop spacer, left-align verbs */
+    .bio-grid { grid-template-columns: 1fr; gap: 18px; }
+    .bio-grid > .spacer { display: none; }
+    .bio-grid .verbs { text-align: left; }
   }
   /* prefers-reduced-motion handled globally in /assets/site.css */
 </style>
@@ -389,14 +401,14 @@
     <h2 class="section-title">Hi, I&rsquo;m <em>Siddharth.</em></h2>
     <div class="section-meta">SOLO PRACTICE · ARLINGTON.TX</div>
   </div>
-  <div style="display:grid;grid-template-columns: 80px 1fr 220px; gap:32px; align-items:start;">
-    <div></div>
-    <div style="max-width: 760px; font-family: var(--sans); font-size: 19px; line-height: 1.55; color: var(--ink);">
-      <p style="margin:0 0 18px;">I&rsquo;m an independent researcher and toolmaker. I run <strong>whenlabs</strong> as a one-person studio &mdash; small, durable software and short papers about <em style="font-family:var(--serif);font-style:italic;color:var(--accent);">language models, attention, and the slow web.</em></p>
-      <p style="margin:0 0 18px;">Most of what I make is open-source and gets used by a few hundred people who care about the same things I do. That&rsquo;s the right size.</p>
-      <p style="margin:0;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:0.04em;">PREVIOUSLY: research · ml infra · type design.</p>
+  <div class="bio-grid">
+    <div class="spacer"></div>
+    <div class="body">
+      <p>I&rsquo;m an independent researcher and toolmaker. I run <strong>whenlabs</strong> as a one-person studio &mdash; small, durable software and short papers about <em>language models, attention, and the slow web.</em></p>
+      <p>Most of what I make is open-source and gets used by a few hundred people who care about the same things I do. That&rsquo;s the right size.</p>
+      <p class="tail">PREVIOUSLY: research · ml infra · type design.</p>
     </div>
-    <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.08em;color:var(--muted);text-transform:uppercase;text-align:right;line-height:1.7;">
+    <div class="verbs">
       <div>WRITES · SHIPS</div>
       <div>READS · ANNOTATES</div>
       <div>TEACHES · OCCASIONALLY</div>
